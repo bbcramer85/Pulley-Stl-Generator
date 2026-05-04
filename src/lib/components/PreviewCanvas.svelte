@@ -63,8 +63,10 @@
   }
 
   function handlePointerDown(event) {
-    dragging = true;
     dragMoved = false;
+    if (previewMode !== "mesh") return;
+    event.preventDefault();
+    dragging = true;
     localView = view;
     lastX = event.clientX;
     lastY = event.clientY;
@@ -73,13 +75,13 @@
 
   function handlePointerMove(event) {
     if (!dragging) return;
+    event.preventDefault();
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
     if (Math.hypot(dx, dy) > 3) dragMoved = true;
     lastX = event.clientX;
     lastY = event.clientY;
 
-    if (previewMode !== "mesh") return;
     localView = {
       ...localView,
       rotZ: localView.rotZ + dx * 0.01,
@@ -89,13 +91,22 @@
   }
 
   function handlePointerUp(event) {
+    if (!dragging) return;
+    event.preventDefault();
     dragging = false;
     if (canvas.hasPointerCapture(event.pointerId)) {
       canvas.releasePointerCapture(event.pointerId);
     }
-    if (previewMode === "mesh" && dragMoved) {
+    if (dragMoved) {
       onViewChange(localView);
     }
+  }
+
+  function handlePointerCancel(event) {
+    if (canvas?.hasPointerCapture(event.pointerId)) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+    dragging = false;
   }
 
   function handleClick(event) {
@@ -143,10 +154,9 @@
     on:pointerdown={handlePointerDown}
     on:pointermove={handlePointerMove}
     on:pointerup={handlePointerUp}
-    on:pointercancel={() => {
-      dragging = false;
-    }}
+    on:pointercancel={handlePointerCancel}
     on:click={handleClick}
     on:wheel={handleWheel}
+    class:mesh-preview={previewMode === "mesh"}
   ></canvas>
 {/key}

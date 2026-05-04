@@ -1981,6 +1981,12 @@ legend {
   cursor: grab;
 }
 
+#previewCanvas.mesh-preview {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 #previewCanvas:active {
   cursor: grabbing;
 }
@@ -2054,6 +2060,7 @@ legend {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
+    gap: 12px;
   }
 
   .calculator-shell {
@@ -2071,21 +2078,105 @@ legend {
   }
 
   .preview-panel {
-    min-height: 520px;
+    order: -1;
+    grid-template-rows: auto minmax(300px, 52vh);
+    min-height: 0;
   }
 
   .preview-toolbar {
     grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 14px;
   }
 
   .project-switcher {
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    margin: 0 -14px;
+    overflow-x: auto;
+    padding: 0 14px 4px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .project-button {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+
+  .preview-info {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: stretch;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .metrics {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .metrics span {
+    flex: 0 0 auto;
+  }
+
+  .view-controls {
+    flex: 0 0 auto;
+    justify-self: end;
+  }
+
+  #previewCanvas {
+    min-height: 300px;
+  }
+
+  .control-panel .title-block {
+    order: 1;
+    position: static;
+    z-index: auto;
+    margin: 0;
+    padding: 2px 0 0;
+    border-bottom: 0;
+    background: transparent;
+  }
+
+  .control-panel .actions {
+    order: 5;
+  }
+
+  .control-panel .status {
+    order: 6;
+  }
+
+  .control-panel .controls {
+    order: 3;
+  }
+
+  .control-panel .affiliate-card {
+    order: 4;
+  }
+
+  .control-panel .creator-card {
+    order: 2;
+    position: static;
+    min-height: 72px;
+    margin: 0;
+    padding-top: 10px;
   }
 }
 
 @media (max-width: 520px) {
   .app-shell {
-    padding: 10px;
+    padding: 8px 10px 12px;
   }
 
   .workspace-nav,
@@ -2093,10 +2184,79 @@ legend {
     padding-inline: 10px;
   }
 
+  .workspace-nav {
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .workspace-brand small {
+    display: none;
+  }
+
+  .workspace-switcher {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workspace-switcher button {
+    padding-inline: 8px;
+  }
+
   .control-panel,
   .preview-toolbar,
   .calculator-toolbar {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .control-panel {
+    gap: 12px;
+  }
+
+  .control-panel .title-block {
+    padding-block: 10px;
+  }
+
+  .control-panel .title-block h1 {
+    font-size: 1.55rem;
+  }
+
+  .preview-panel {
+    grid-template-rows: auto minmax(280px, 50vh);
+  }
+
+  .preview-toolbar .eyebrow {
+    display: none;
+  }
+
+  .preview-toolbar h2 {
+    font-size: 0.98rem;
+  }
+
+  .metrics span {
+    font-size: 0.74rem;
+    min-height: 26px;
+    padding: 3px 8px;
+  }
+
+  .view-controls {
+    grid-template-columns: 32px auto 32px;
+  }
+
+  .view-controls button {
+    min-width: 32px;
+  }
+
+  .project-switcher {
+    margin-inline: -12px;
+    padding-inline: 12px;
+  }
+
+  .project-button {
+    font-size: 0.78rem;
+  }
+
+  #previewCanvas {
+    min-height: 280px;
   }
 
   .field {
@@ -2114,7 +2274,7 @@ legend {
   }
 
   .preview-info {
-    justify-items: start;
+    justify-items: stretch;
   }
 
   .rpm-results-grid,
