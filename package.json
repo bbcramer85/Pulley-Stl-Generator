@@ -10,7 +10,8 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "serve-handler": "^6.1.7"
+    "serve-handler": "^6.1.7",
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",

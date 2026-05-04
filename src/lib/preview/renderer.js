@@ -8,7 +8,8 @@ export function renderPreview(canvas, mesh, view, context) {
     renderDxfPreview(canvas, mesh, view, context);
     return;
   }
-  renderMeshPreview(canvas, mesh, view);
+  const ctx = canvas.getContext("2d");
+  ctx?.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 export function resizeCanvas(canvas) {
@@ -20,77 +21,6 @@ export function resizeCanvas(canvas) {
     canvas.width = width;
     canvas.height = height;
   }
-}
-
-function renderMeshPreview(canvas, mesh, view) {
-  resizeCanvas(canvas);
-  const ctx = canvas.getContext("2d");
-  const { width, height } = canvas;
-  ctx.clearRect(0, 0, width, height);
-
-  const transformed = [];
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  mesh.triangles.forEach((tri) => {
-    const a = rotatePoint(tri.a, view.rotX, view.rotZ);
-    const b = rotatePoint(tri.b, view.rotX, view.rotZ);
-    const c = rotatePoint(tri.c, view.rotX, view.rotZ);
-    minX = Math.min(minX, a[0], b[0], c[0]);
-    minY = Math.min(minY, a[1], b[1], c[1]);
-    maxX = Math.max(maxX, a[0], b[0], c[0]);
-    maxY = Math.max(maxY, a[1], b[1], c[1]);
-    transformed.push({
-      a,
-      b,
-      c,
-      normal: rotatePoint(tri.normal, view.rotX, view.rotZ),
-      depth: (a[2] + b[2] + c[2]) / 3,
-    });
-  });
-
-  const modelW = Math.max(1, maxX - minX);
-  const modelH = Math.max(1, maxY - minY);
-  const scale = Math.min((width * 0.82) / modelW, (height * 0.82) / modelH) * view.zoom;
-  const offsetX = width / 2 - ((minX + maxX) / 2) * scale;
-  const offsetY = height / 2 + ((minY + maxY) / 2) * scale;
-  const light = [-0.35, -0.25, 0.9];
-  const lightLen = Math.hypot(...light);
-  const lightUnit = light.map((v) => v / lightLen);
-
-  transformed.sort((a, b) => a.depth - b.depth);
-  transformed.forEach((tri) => {
-    const shade = clamp(
-      tri.normal[0] * lightUnit[0] + tri.normal[1] * lightUnit[1] + tri.normal[2] * lightUnit[2],
-      -0.55,
-      1
-    );
-    const intensity = Math.round(154 + shade * 70);
-    const edge = Math.round(96 + shade * 36);
-    ctx.beginPath();
-    ctx.moveTo(tri.a[0] * scale + offsetX, -tri.a[1] * scale + offsetY);
-    ctx.lineTo(tri.b[0] * scale + offsetX, -tri.b[1] * scale + offsetY);
-    ctx.lineTo(tri.c[0] * scale + offsetX, -tri.c[1] * scale + offsetY);
-    ctx.closePath();
-    ctx.fillStyle = `rgb(${Math.max(80, intensity - 24)}, ${Math.max(92, intensity)}, ${Math.max(90, intensity - 4)})`;
-    ctx.strokeStyle = `rgba(${edge - 38}, ${edge}, ${edge - 6}, 0.28)`;
-    ctx.lineWidth = Math.max(0.35, window.devicePixelRatio * 0.35);
-    ctx.fill();
-    ctx.stroke();
-  });
-}
-
-function rotatePoint(p, rotX, rotZ) {
-  const cz = Math.cos(rotZ);
-  const sz = Math.sin(rotZ);
-  const cx = Math.cos(rotX);
-  const sx = Math.sin(rotX);
-  const xz = p[0] * cz - p[1] * sz;
-  const yz = p[0] * sz + p[1] * cz;
-  const zz = p[2];
-  return [xz, yz * cx - zz * sx, yz * sx + zz * cx];
 }
 
 function renderDxfPreview(canvas, mesh, view, context) {
@@ -514,8 +444,4 @@ function shortestAngleDelta(a, b) {
   while (delta > Math.PI) delta -= Math.PI * 2;
   while (delta < -Math.PI) delta += Math.PI * 2;
   return delta;
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
 }
