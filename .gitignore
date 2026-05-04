@@ -6,4 +6,6 @@ coverage/
 *.log
 .env
 .env.*
+*.url
 dist-smoke.png
+tractor-preview-qr.png
