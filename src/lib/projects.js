@@ -1,0 +1,135 @@
+import { legacy } from "./legacy.js";
+
+export const projectOrder = [
+  "flatBeltPulley",
+  "vBeltPulley",
+  "sprocket",
+  "straightCutGear",
+  "bevelGear",
+  "shaftSpacer",
+  "headGasket",
+  "ignitorGasket",
+  "dripOilerGasket",
+];
+
+export function createProjectConfigs() {
+  const engine = legacy();
+  return {
+    flatBeltPulley: {
+      label: "Flat Belt Pulley",
+      defaults: engine.pulleyDefaults,
+      controlGroups: engine.pulleyControlGroups,
+      validate: engine.validatePulley,
+      generate: engine.generatePulleyMesh,
+      metrics: engine.pulleyMetricRows,
+      filePrefix: "flatbelt-pulley",
+      stlName: "flatbelt_pulley",
+      fileDimensionKey: "diameter",
+    },
+    vBeltPulley: {
+      label: "V-Belt Pulley",
+      defaults: engine.vBeltPulleyDefaults,
+      controlGroups: engine.vBeltPulleyControlGroups,
+      validate: engine.validateVBeltPulley,
+      generate: engine.generateVBeltPulleyMesh,
+      metrics: engine.vBeltPulleyMetricRows,
+      filePrefix: "vbelt-pulley",
+      stlName: "vbelt_pulley",
+      fileDimensionKey: "vOuterDiameter",
+    },
+    sprocket: {
+      label: "Sprocket",
+      defaults: engine.sprocketDefaults,
+      controlGroups: engine.sprocketControlGroups,
+      validate: engine.validateSprocket,
+      generate: engine.generateSprocketMesh,
+      metrics: engine.sprocketMetricRows,
+      filePrefix: "sprocket",
+      stlName: "sprocket",
+      fileDimensionKey: "sprocketToothCount",
+    },
+    straightCutGear: {
+      label: "Straight Cut Gear",
+      defaults: engine.straightCutGearDefaults,
+      controlGroups: engine.straightCutGearControlGroups,
+      validate: engine.validateStraightCutGear,
+      generate: engine.generateStraightCutGearMesh,
+      metrics: engine.straightCutGearMetricRows,
+      filePrefix: "straight-cut-gear",
+      stlName: "straight_cut_gear",
+      fileDimensionKey: "gearToothCount",
+    },
+    bevelGear: {
+      label: "Bevel Gear",
+      defaults: engine.bevelGearDefaults,
+      controlGroups: engine.bevelGearControlGroups,
+      validate: engine.validateBevelGear,
+      generate: engine.generateBevelGearMesh,
+      metrics: engine.bevelGearMetricRows,
+      filePrefix: "bevel-gear",
+      stlName: "bevel_gear",
+      fileDimensionKey: "bevelToothCount",
+    },
+    shaftSpacer: {
+      label: "Shaft Spacer",
+      defaults: engine.shaftSpacerDefaults,
+      controlGroups: engine.shaftSpacerControlGroups,
+      validate: engine.validateShaftSpacer,
+      generate: engine.generateShaftSpacerMesh,
+      metrics: engine.shaftSpacerMetricRows,
+      filePrefix: "shaft-spacer",
+      stlName: "shaft_spacer",
+      fileDimensionKey: "spacerOuterDiameter",
+    },
+    headGasket: {
+      label: "Head Gasket",
+      defaults: engine.headGasketDefaults,
+      controlGroups: engine.headGasketControlGroups,
+      validate: engine.validateHeadGasket,
+      generate: engine.generateHeadGasketDxf,
+      metrics: engine.headGasketMetricRows,
+      filePrefix: "head-gasket",
+      stlName: "head_gasket",
+      fileDimensionKey: "gasketOuterDiameter",
+      exportType: "dxf",
+      downloadLabel: "Download DXF",
+      previewTitle: "2D DXF View",
+    },
+    ignitorGasket: {
+      label: "Ignitor Gasket",
+      defaults: engine.ignitorGasketDefaults,
+      controlGroups: engine.ignitorGasketControlGroups,
+      validate: engine.validateIgnitorGasket,
+      generate: engine.generateIgnitorGasketDxf,
+      metrics: engine.ignitorGasketMetricRows,
+      filePrefix: "ignitor-gasket",
+      stlName: "ignitor_gasket",
+      fileDimensionKey: "ignitorCenterCircleDiameter",
+      exportType: "dxf",
+      downloadLabel: "Download DXF",
+      previewTitle: "2D DXF View",
+    },
+    dripOilerGasket: {
+      label: "Drip Oiler Gasket",
+      defaults: engine.dripOilerGasketDefaults,
+      controlGroups: engine.dripOilerGasketControlGroups,
+      validate: engine.validateDripOilerGasket,
+      generate: engine.generateDripOilerGasketDxf,
+      metrics: engine.dripOilerGasketMetricRows,
+      filePrefix: "drip-oiler-gasket",
+      stlName: "drip_oiler_gasket",
+      fileDimensionKey: "dripOilerOuterDiameter",
+      exportType: "dxf",
+      downloadLabel: "Download DXF",
+      previewTitle: "2D DXF View",
+    },
+  };
+}
+
+export function cloneDefaults(project) {
+  return structuredClone(project.defaults);
+}
+
+export function buildFieldMap(groups) {
+  return new Map(groups.flatMap((group) => group.fields).map((field) => [field.key, field]));
+}
