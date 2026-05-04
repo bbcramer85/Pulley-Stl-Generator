@@ -120,7 +120,12 @@
     if (target) onHeadGasketDelete(target);
   }
 
+  function isMobilePreviewLayout() {
+    return window.matchMedia("(max-width: 900px)").matches;
+  }
+
   function handleWheel(event) {
+    if (isMobilePreviewLayout()) return;
     event.preventDefault();
     const nextZoom = Math.min(5.5, Math.max(0.35, view.zoom * Math.exp(-event.deltaY * 0.0012)));
     if (previewMode === "mesh") {

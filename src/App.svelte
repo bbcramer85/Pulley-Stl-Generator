@@ -284,9 +284,25 @@
           <div class="preview-info">
             <MetricPills rows={metricRows} />
             <div class="view-controls" aria-label="Preview controls">
-              <button type="button" disabled={!mesh} on:click={() => setPreviewZoom(view.zoom / 1.18)}>-</button>
+              <button
+                class="zoom-control"
+                type="button"
+                aria-label="Zoom out"
+                disabled={!mesh}
+                on:click={() => setPreviewZoom(view.zoom / 1.18)}
+              >
+                -
+              </button>
               <button type="button" class:active={view.zoom === 1} disabled={!mesh} on:click={resetPreviewView}>Fit</button>
-              <button type="button" disabled={!mesh} on:click={() => setPreviewZoom(view.zoom * 1.18)}>+</button>
+              <button
+                class="zoom-control"
+                type="button"
+                aria-label="Zoom in"
+                disabled={!mesh}
+                on:click={() => setPreviewZoom(view.zoom * 1.18)}
+              >
+                +
+              </button>
             </div>
           </div>
         </div>

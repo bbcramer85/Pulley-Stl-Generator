@@ -2079,6 +2079,10 @@ legend {
 
   .preview-panel {
     order: -1;
+    position: sticky;
+    top: max(8px, env(safe-area-inset-top));
+    z-index: 5;
+    align-self: start;
     grid-template-rows: auto minmax(300px, 52vh);
     min-height: 0;
   }
@@ -2132,7 +2136,16 @@ legend {
 
   .view-controls {
     flex: 0 0 auto;
+    grid-template-columns: auto;
     justify-self: end;
+  }
+
+  .view-controls .zoom-control {
+    display: none;
+  }
+
+  .view-controls button {
+    min-width: 54px;
   }
 
   #previewCanvas {
@@ -2239,11 +2252,15 @@ legend {
   }
 
   .view-controls {
-    grid-template-columns: 32px auto 32px;
+    grid-template-columns: auto;
+  }
+
+  .view-controls .zoom-control {
+    display: none;
   }
 
   .view-controls button {
-    min-width: 32px;
+    min-width: 54px;
   }
 
   .project-switcher {
