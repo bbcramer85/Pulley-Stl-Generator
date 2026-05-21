@@ -2058,6 +2058,9 @@ legend {
   }
 
   .app-shell {
+    grid-template-areas:
+      "preview"
+      "settings";
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr);
     height: 100%;
@@ -2078,22 +2081,29 @@ legend {
   }
 
   .control-panel {
+    grid-area: settings;
+    position: relative;
+    z-index: 1;
+    contain: paint;
+    clip-path: inset(0 round 8px);
     min-height: 0;
     max-height: none;
-    overflow-y: auto;
+    overflow: hidden auto;
     overscroll-behavior: contain;
     padding-bottom: max(24px, env(safe-area-inset-bottom));
     scroll-padding-block: 12px 36vh;
+    touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
   }
 
   .preview-panel {
-    order: -1;
+    grid-area: preview;
+    order: 0;
     position: relative;
     top: auto;
-    z-index: 5;
+    z-index: 2;
     align-self: start;
-    grid-template-rows: auto minmax(220px, 32dvh);
+    grid-template-rows: auto minmax(160px, 24dvh);
     min-height: 0;
   }
 
@@ -2159,7 +2169,7 @@ legend {
   }
 
   #previewCanvas {
-    min-height: 220px;
+    min-height: 160px;
   }
 
   .control-panel .title-block {
@@ -2244,7 +2254,7 @@ legend {
   }
 
   .preview-panel {
-    grid-template-rows: auto minmax(190px, 30dvh);
+    grid-template-rows: auto minmax(125px, 22dvh);
   }
 
   .preview-toolbar .eyebrow {
@@ -2283,7 +2293,7 @@ legend {
   }
 
   #previewCanvas {
-    min-height: 190px;
+    min-height: 125px;
   }
 
   .field {
@@ -2323,10 +2333,6 @@ legend {
 }
 
 @media (max-width: 900px) {
-  .control-panel .field:focus-within {
-    scroll-margin-block: 12px 42vh;
-  }
-
   .workspace:has(.control-panel:focus-within) {
     grid-template-rows: minmax(0, 1fr);
   }
