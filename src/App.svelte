@@ -81,10 +81,13 @@
   function handleProjectChange(nextProjectKey) {
     if (!projectConfigs[nextProjectKey] || nextProjectKey === projectKey) {
       rebuild();
+      fitDxfPreviewAfterLayout(activeProject);
       return;
     }
+    const nextProject = projectConfigs[nextProjectKey];
     projectKey = nextProjectKey;
     rebuild(paramsByProject[nextProjectKey], { projectKey: nextProjectKey });
+    fitDxfPreviewAfterLayout(nextProject);
   }
 
   function handleFieldChange(fieldKey, value) {
@@ -99,12 +102,14 @@
       [projectKey]: nextParams,
     };
     rebuild(nextParams);
+    fitDxfPreviewAfterLayout(activeProject);
   }
 
   function handleUnitChange(nextUnit) {
     if (!engine.unitOptions[nextUnit] || nextUnit === unit) return;
     unit = nextUnit;
     rebuild(activeParams);
+    fitDxfPreviewAfterLayout(activeProject);
   }
 
   function handleReset() {
@@ -123,6 +128,7 @@
       showDxfDimensions: false,
     };
     rebuild(nextParams);
+    fitDxfPreviewAfterLayout(activeProject);
   }
 
   function handleDownload() {
@@ -168,7 +174,22 @@
     }
 
     rebuild(activeParams, { clearStatus: false });
+    fitDxfPreviewAfterLayout(activeProject);
     statusOverride = `${target.type === "bolt" ? "Bolt hole" : "Slot"} removed from this gasket pattern. Reset restores removed gasket features.`;
+  }
+
+  function fitDxfPreviewAfterLayout(project = activeProject) {
+    if (project?.exportType !== "dxf") return;
+    view = {
+      ...view,
+      zoom: 1,
+    };
+    requestAnimationFrame(() => {
+      view = {
+        ...view,
+        zoom: 1,
+      };
+    });
   }
 
   function setPreviewZoom(zoom) {
@@ -252,7 +273,7 @@
   </nav>
 
   {#if workspace === "generator"}
-    <div class="app-shell">
+    <div class="app-shell" class:dxf-workspace={activeProject.exportType === "dxf"}>
       <ControlPanel
         project={activeProject}
         {projectKey}
@@ -266,7 +287,8 @@
         onUnitChange={handleUnitChange}
         onFieldChange={handleFieldChange}
         onDxfDimensionsChange={(showDxfDimensions) => {
-          view = { ...view, showDxfDimensions };
+          view = { ...view, showDxfDimensions, zoom: 1 };
+          fitDxfPreviewAfterLayout(activeProject);
         }}
         onDownload={handleDownload}
         onReset={handleReset}

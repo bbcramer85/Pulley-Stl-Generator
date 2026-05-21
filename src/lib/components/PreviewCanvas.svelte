@@ -21,6 +21,7 @@
   let lastParentView = view;
   let webglRenderer = null;
   let webglCanvas = null;
+  let resizeObserver = null;
 
   $: previewMode = mesh?.kind === "dxf" ? "dxf" : "mesh";
   $: if (!dragging && view !== lastParentView) {
@@ -140,6 +141,10 @@
 
   onMount(() => {
     window.addEventListener("resize", requestRender);
+    if (window.ResizeObserver && canvas) {
+      resizeObserver = new ResizeObserver(requestRender);
+      resizeObserver.observe(canvas);
+    }
     requestRender();
   });
 
@@ -147,6 +152,7 @@
 
   onDestroy(() => {
     window.removeEventListener("resize", requestRender);
+    resizeObserver?.disconnect();
     disposeWebglRenderer();
   });
 </script>

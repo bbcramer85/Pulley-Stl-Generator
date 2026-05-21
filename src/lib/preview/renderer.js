@@ -15,8 +15,8 @@ export function renderPreview(canvas, mesh, view, context) {
 export function resizeCanvas(canvas) {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  const width = Math.max(320, Math.floor(rect.width * dpr));
-  const height = Math.max(260, Math.floor(rect.height * dpr));
+  const width = Math.max(1, Math.floor(rect.width * dpr));
+  const height = Math.max(1, Math.floor(rect.height * dpr));
   if (canvas.width !== width || canvas.height !== height) {
     canvas.width = width;
     canvas.height = height;
@@ -64,15 +64,16 @@ function renderDxfPreview(canvas, mesh, view, context) {
 export function getDxfPreviewTransform(canvas, mesh, view) {
   const { width, height } = canvas;
   const bounds = mesh.bounds;
-  const paddingRatio = mesh.kind === "dxf" ? 0.16 : 0.08;
-  const padding = Math.max(0.15, Math.max(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY) * paddingRatio);
+  const paddingRatio = view.showDxfDimensions ? 0.12 : 0.035;
+  const fitRatio = view.showDxfDimensions ? 0.86 : 0.96;
+  const padding = Math.max(0.025, Math.max(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY) * paddingRatio);
   const minX = bounds.minX - padding;
   const maxX = bounds.maxX + padding;
   const minY = bounds.minY - padding;
   const maxY = bounds.maxY + padding;
   const modelW = Math.max(0.001, maxX - minX);
   const modelH = Math.max(0.001, maxY - minY);
-  const scale = Math.min((width * 0.82) / modelW, (height * 0.82) / modelH) * view.zoom;
+  const scale = Math.min((width * fitRatio) / modelW, (height * fitRatio) / modelH) * view.zoom;
   const offsetX = width / 2 - ((minX + maxX) / 2) * scale;
   const offsetY = height / 2 + ((minY + maxY) / 2) * scale;
   return { scale, offsetX, offsetY };

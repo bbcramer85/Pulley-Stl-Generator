@@ -2539,4 +2539,12 @@ legend {
   .control-panel:focus-within + .preview-panel #previewCanvas {
     min-height: 80px;
   }
+
+  .app-shell.dxf-workspace .control-panel:focus-within + .preview-panel {
+    grid-template-rows: auto minmax(210px, 28dvh);
+  }
+
+  .app-shell.dxf-workspace .control-panel:focus-within + .preview-panel #previewCanvas {
+    min-height: 210px;
+  }
 }
