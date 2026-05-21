@@ -2057,6 +2057,14 @@ legend {
     flex-direction: column;
   }
 
+  .workspace:has(.calculator-shell:not([hidden])) {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .workspace:has(.calculator-shell:not([hidden])) .workspace-brand {
+    display: none;
+  }
+
   .app-shell {
     grid-template-areas:
       "preview"
@@ -2078,7 +2086,7 @@ legend {
   .rpm-workspace,
   .tractor-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(min(380px, 58dvh), 58dvh) minmax(0, 1fr);
+    grid-template-rows: minmax(min(470px, 72dvh), 72dvh) minmax(0, 1fr);
     height: 100%;
     min-height: 0;
     overflow: hidden;
@@ -2104,21 +2112,51 @@ legend {
     min-height: 0;
   }
 
+  .rpm-animation-panel {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .rpm-animation-header {
+    display: none;
+  }
+
   .rpm-affiliate-rotator {
     display: none;
   }
 
+  .rpm-animation-stack,
+  .rpm-animation-stack.rpm-sequence-view {
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(0, 1fr);
+    align-content: stretch;
+    align-items: stretch;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .rpm-animation-stack.rpm-sequence-view > .rpm-stage-svg {
+    align-self: stretch;
+    justify-self: stretch;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+  }
+
   .rpm-stage-svg {
-    min-height: clamp(150px, 24dvh, 230px);
+    min-height: clamp(220px, 34dvh, 320px);
   }
 
   .linked-belt-svg,
   .rpm-sequence-view .linked-belt-svg {
-    min-height: clamp(240px, 36dvh, 340px);
+    height: 100%;
+    min-height: clamp(360px, 60dvh, 520px);
   }
 
   .tractor-page-svg {
-    min-height: clamp(250px, 38dvh, 360px);
+    height: 100%;
+    min-height: clamp(360px, 60dvh, 520px);
   }
 
   .control-panel {

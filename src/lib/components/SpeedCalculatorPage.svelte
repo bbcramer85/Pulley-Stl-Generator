@@ -30,6 +30,7 @@
   const affiliateRotationMs = 9000;
   let rotatingAffiliateCards = driveSupplyAffiliateCards.slice(0, visibleAffiliateCount);
   let lastAffiliateSignature = rotatingAffiliateCards.map((card) => card.href).join("|");
+  let compactAnimationLayout = false;
 
   function shuffledAffiliateCards() {
     const cards = [...driveSupplyAffiliateCards];
@@ -62,9 +63,17 @@
   onMount(() => {
     rotateAffiliateCards();
     const affiliateTimer = window.setInterval(rotateAffiliateCards, affiliateRotationMs);
+    const compactQuery = window.matchMedia("(max-width: 900px)");
+    const updateCompactLayout = () => {
+      compactAnimationLayout = compactQuery.matches;
+    };
+
+    updateCompactLayout();
+    compactQuery.addEventListener("change", updateCompactLayout);
 
     return () => {
       window.clearInterval(affiliateTimer);
+      compactQuery.removeEventListener("change", updateCompactLayout);
     };
   });
 
@@ -234,7 +243,7 @@
     return ordered;
   }
 
-  function chainStageLayout(stages, startX, startY, endY, showMixer, enginePulleyRadius) {
+  function chainStageLayout(stages, startX, startY, endY, showMixer, enginePulleyRadius, minimumSpacing = 95) {
     let currentX = startX;
     let currentY = startY;
 
@@ -245,7 +254,7 @@
       if (stage.type === "belt") {
         const driverRadius = index === 0 ? enginePulleyRadius : wheelRadius(stage.driver, maxSize, 58);
         const drivenRadius = wheelRadius(stage.driven, maxSize, 58);
-        const spacing = Math.max(95, Number(stage.spacing || 170));
+        const spacing = Math.max(minimumSpacing, Number(stage.spacing || 170));
         const drivenX = currentX + spacing;
         const labelY = Math.max(24, Math.min(currentY - driverRadius, targetY - drivenRadius) - 12);
         const layout = {
@@ -598,6 +607,10 @@
   {@const tractorEngineShake = engineShakeLevel(tractorEngineRpm)}
   {@const tractorEngineSteam = steamLevel(tractorEngineRpm)}
   {@const tractorEngineFailed = tractorEngineRpm >= 1000}
+  {@const tractorViewBox = compactAnimationLayout ? "0 0 670 300" : "0 0 760 300"}
+  {@const tractorSceneTransform = compactAnimationLayout ? "translate(-60 10) scale(1.18)" : ""}
+  {@const tractorTitleX = compactAnimationLayout ? 70 : 24}
+  {@const tractorSpeedLabelX = compactAnimationLayout ? 574 : 666}
   <section class="calculator-panel rpm-panel tractor-panel" aria-label="Tractor drive calculator">
     <div class="tractor-workspace">
       <section class="rpm-controls tractor-controls" aria-label="Tractor inputs">
@@ -778,11 +791,12 @@
             <svg
               class="rpm-stage-svg tractor-svg tractor-page-svg"
               class:drivetrain-blown={tractorEngineFailed}
-              viewBox="0 0 760 300"
+              viewBox={tractorViewBox}
               role="img"
               aria-label="Tractor drive wheel speed"
             >
-              <text x="24" y="34" class="rpm-svg-title">Drive Wheel Tractor</text>
+              <g transform={tractorSceneTransform}>
+              <text x={tractorTitleX} y="34" class="rpm-svg-title">Drive Wheel Tractor</text>
               <path d="M112 116 H386 Q416 116 432 144 L452 197 H94 Q66 197 66 171 V143 Q66 116 112 116 Z" class="tractor-body" />
               <path d="M366 48 H574 L550 160 H338 Z" class="tractor-cab" />
               <rect x="408" y="74" width="54" height="58" class="tractor-window" />
@@ -903,8 +917,9 @@
                 {/each}
               </g>
               <text x={rearAxleX} y={tractorWheelLabelY} text-anchor="middle" class="rpm-svg-note">{fmt(calc.finalRpm, 1)} rpm rear wheel</text>
-              <text x="666" y="92" text-anchor="middle" class="tractor-speed-label">{fmt(calc.travelMph, 2)} mph</text>
-              <text x="666" y="112" text-anchor="middle" class="rpm-svg-note">ground speed</text>
+              <text x={tractorSpeedLabelX} y="92" text-anchor="middle" class="tractor-speed-label">{fmt(calc.travelMph, 2)} mph</text>
+              <text x={tractorSpeedLabelX} y="112" text-anchor="middle" class="rpm-svg-note">ground speed</text>
+              </g>
             </svg>
           </div>
 
@@ -1099,14 +1114,24 @@
 
         <div class="rpm-animation-stack rpm-sequence-view">
           {#if showAnimation && visibleRenderStages.length > 0}
-            {@const shaftStart = 150}
+            {@const compactRender = compactAnimationLayout}
+            {@const compactStages = compactRender
+              ? visibleRenderStages.map((stage) => stage.type === "belt" ? { ...stage, spacing: Math.max(76, Number(stage.spacing || 170) * 0.54) } : stage)
+              : visibleRenderStages}
+            {@const shaftStart = compactRender ? 112 : 150}
             {@const shaftY = 118}
-            {@const mixerY = showIceCreamDisplay ? shaftY - 30 : shaftY}
-            {@const engineDriverDiameter = visibleRenderStages[0]?.type === "belt" ? visibleRenderStages[0].driver : calc.beltStages[0]?.driver ?? 5}
+            {@const mixerY = showIceCreamDisplay ? (compactRender ? shaftY + 88 : shaftY - 30) : shaftY}
+            {@const engineDriverDiameter = compactStages[0]?.type === "belt" ? compactStages[0].driver : calc.beltStages[0]?.driver ?? 5}
             {@const enginePulleyRadius = pulleyRadiusFromDiameter(engineDriverDiameter, 1.8, 8, 48)}
-            {@const chainLayouts = chainStageLayout(visibleRenderStages, shaftStart, shaftY, mixerY, showIceCreamDisplay, enginePulleyRadius)}
+            {@const chainLayouts = chainStageLayout(compactStages, shaftStart, shaftY, mixerY, showIceCreamDisplay, enginePulleyRadius, compactRender ? 76 : 95)}
             {@const chainDisplayEndX = chainLayouts[chainLayouts.length - 1].drivenX}
-            {@const beltChainWidth = Math.max(540, chainDisplayEndX + (showIceCreamDisplay ? 180 : 120))}
+            {@const beltChainWidth = compactRender
+              ? Math.max(400, chainDisplayEndX + (showIceCreamDisplay ? 126 : 84))
+              : Math.max(540, chainDisplayEndX + (showIceCreamDisplay ? 180 : 120))}
+            {@const beltChainHeight = compactRender ? 290 : 220}
+            {@const shaftLineBottom = compactRender ? 240 : 180}
+            {@const statusBaseY = compactRender ? 248 : 185}
+            {@const metricBaseY = compactRender ? 185 : 185}
             {@const hasDisplayedBelts = chainLayouts.some((stage) => stage.type === "belt")}
             {@const hasDisplayedGears = chainLayouts.some((stage) => stage.type === "gear")}
             {@const engineRpm = Number(n1)}
@@ -1117,7 +1142,7 @@
             <svg
               class="rpm-stage-svg linked-belt-svg"
               class:drivetrain-blown={engineFailed}
-              viewBox={`0 0 ${beltChainWidth} 220`}
+              viewBox={`0 0 ${beltChainWidth} ${beltChainHeight}`}
               role="img"
               aria-label="Linked belt stage drivetrain"
             >
@@ -1167,9 +1192,9 @@
 
               {#if showIceCreamDisplay}
                 {@const makerX = chainDisplayEndX}
-                {@const makerBodyX = makerX + 82}
-                {@const makerPulleyY = shaftY - 30}
-                {@const makerBodyY = -6}
+                {@const makerBodyX = makerX + (compactRender ? 66 : 82)}
+                {@const makerPulleyY = compactRender ? mixerY : shaftY - 30}
+                {@const makerBodyY = compactRender ? 66 : -6}
                 <g class={`icecream-maker ${iceCreamMaker.tone}`} aria-label={`Ice cream mixer ${iceCreamMaker.label}`}>
                   <path d={`M ${makerBodyX - 126} ${88 + makerBodyY} Q ${makerBodyX - 82} ${68 + makerBodyY} ${makerBodyX - 38} ${88 + makerBodyY} L ${makerBodyX - 48} ${176 + makerBodyY} Q ${makerBodyX - 82} ${190 + makerBodyY} ${makerBodyX - 116} ${176 + makerBodyY} Z`} class="maker-bucket" />
                   <ellipse cx={makerBodyX - 82} cy={88 + makerBodyY} rx="47" ry="15" class="maker-rim" />
@@ -1190,8 +1215,8 @@
               {#each chainLayouts as stage, index}
                 {#if stage.type === "belt"}
                   <text x={stage.labelX} y={stage.labelY} text-anchor="middle" class="linked-belt-label">Belt {stage.labelIndex}{stage.twisted ? " twisted" : ""}</text>
-                  <line x1={stage.driverX} y1="64" x2={stage.driverX} y2="180" class="common-shaft" />
-                  <line x1={stage.drivenX} y1="64" x2={stage.drivenX} y2="180" class="common-shaft" />
+                  <line x1={stage.driverX} y1="64" x2={stage.driverX} y2={shaftLineBottom} class="common-shaft" />
+                  <line x1={stage.drivenX} y1="64" x2={stage.drivenX} y2={shaftLineBottom} class="common-shaft" />
                   {#if stage.twisted}
                     {@const twistedRuns = crossedBeltTangents(stage.driverX, stage.driverY, stage.driverRadius, stage.drivenX, stage.drivenY, stage.drivenRadius)}
                     <path class="rpm-belt-run" d={`M ${twistedRuns[0].x1} ${twistedRuns[0].y1} L ${twistedRuns[0].x2} ${twistedRuns[0].y2}`} />
@@ -1213,9 +1238,9 @@
                   </g>
                   <circle cx={stage.drivenX} cy={stage.drivenY} r="5" class="common-shaft-hub" />
                   {#if showIceCreamDisplay && index === chainLayouts.length - 1}
-                    <rect x={stage.drivenX - 63} y="185" width="126" height="27" rx="7" class="maker-status-bg" />
-                    <text x={stage.drivenX} y="198" text-anchor="middle" class="maker-status-label">{iceCreamMaker.label}</text>
-                    <text x={stage.drivenX} y="209" text-anchor="middle" class="maker-status-rpm">{fmt(stage.outRpm, 1)} rpm</text>
+                    <rect x={stage.drivenX - 63} y={statusBaseY} width="126" height="27" rx="7" class="maker-status-bg" />
+                    <text x={stage.drivenX} y={statusBaseY + 13} text-anchor="middle" class="maker-status-label">{iceCreamMaker.label}</text>
+                    <text x={stage.drivenX} y={statusBaseY + 24} text-anchor="middle" class="maker-status-rpm">{fmt(stage.outRpm, 1)} rpm</text>
                   {:else}
                     <text x={stage.drivenX} y="202" text-anchor="middle" class="rpm-svg-note">{fmt(stage.outRpm, 1)} rpm</text>
                   {/if}
@@ -1233,8 +1258,8 @@
                   />
                 {:else}
                   <text x={stage.labelX} y={stage.labelY} text-anchor="middle" class="linked-gear-label">Gear {stage.labelIndex}</text>
-                  <line x1={stage.driverX} y1="64" x2={stage.driverX} y2="180" class="common-shaft" />
-                  <line x1={stage.drivenX} y1="64" x2={stage.drivenX} y2="180" class="common-shaft" />
+                  <line x1={stage.driverX} y1="64" x2={stage.driverX} y2={shaftLineBottom} class="common-shaft" />
+                  <line x1={stage.drivenX} y1="64" x2={stage.drivenX} y2={shaftLineBottom} class="common-shaft" />
                   <g class:rpm-spin-reverse={stage.inDirection < 0} class:rpm-spin-paused={rpmStopped(stage.inRpm)} class="rpm-spin" style={`animation-duration:${period(stage.inRpm)}s`}>
                     <path d={gearPath(stage.driverX, stage.driverY, stage.driverRadius, Math.round(stage.driver * 6))} class="rpm-gear inline-gear" />
                     <circle cx={stage.driverX} cy={stage.driverY} r={Math.max(4, stage.driverRadius * 0.22)} class="inline-gear-hub" />
@@ -1245,17 +1270,17 @@
                   </g>
                   <circle cx={stage.drivenX} cy={stage.drivenY} r="5" class="common-shaft-hub" />
                   {#if showIceCreamDisplay && index === chainLayouts.length - 1}
-                    <rect x={stage.drivenX - 63} y="185" width="126" height="27" rx="7" class="maker-status-bg" />
-                    <text x={stage.drivenX} y="198" text-anchor="middle" class="maker-status-label">{iceCreamMaker.label}</text>
-                    <text x={stage.drivenX} y="209" text-anchor="middle" class="maker-status-rpm">{fmt(stage.outRpm, 1)} rpm</text>
+                    <rect x={stage.drivenX - 63} y={statusBaseY} width="126" height="27" rx="7" class="maker-status-bg" />
+                    <text x={stage.drivenX} y={statusBaseY + 13} text-anchor="middle" class="maker-status-label">{iceCreamMaker.label}</text>
+                    <text x={stage.drivenX} y={statusBaseY + 24} text-anchor="middle" class="maker-status-rpm">{fmt(stage.outRpm, 1)} rpm</text>
                   {:else}
                     <text x={stage.drivenX} y="202" text-anchor="middle" class="rpm-svg-note">{fmt(stage.outRpm, 1)} rpm</text>
                   {/if}
                 {/if}
               {/each}
-              <rect x={shaftStart - 57} y="185" width="114" height="34" rx="7" class="engine-metric-bg" />
-              <text x={shaftStart} y="199" text-anchor="middle" class="engine-metric-text">engine {fmt(engineRpm, 0)} rpm</text>
-              <text x={shaftStart} y="213" text-anchor="middle" class="engine-metric-text">pulley D {fmt(engineDriverDiameter, 2)}</text>
+              <rect x={shaftStart - 57} y={metricBaseY} width="114" height="34" rx="7" class="engine-metric-bg" />
+              <text x={shaftStart} y={metricBaseY + 14} text-anchor="middle" class="engine-metric-text">engine {fmt(engineRpm, 0)} rpm</text>
+              <text x={shaftStart} y={metricBaseY + 28} text-anchor="middle" class="engine-metric-text">pulley D {fmt(engineDriverDiameter, 2)}</text>
             </svg>
           {/if}
 
