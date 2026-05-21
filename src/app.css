@@ -2061,12 +2061,12 @@ legend {
     flex-direction: column;
   }
 
-  .workspace:has(.calculator-shell:not([hidden])) {
-    grid-template-rows: auto minmax(0, 1fr);
+  .workspace-brand {
+    display: none;
   }
 
-  .workspace:has(.calculator-shell:not([hidden])) .workspace-brand {
-    display: none;
+  .workspace:has(.calculator-shell:not([hidden])) {
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .app-shell {
@@ -2267,7 +2267,7 @@ legend {
     top: auto;
     z-index: 2;
     align-self: start;
-    grid-template-rows: auto minmax(160px, 24dvh);
+    grid-template-rows: auto minmax(220px, 30dvh);
     min-height: 0;
   }
 
@@ -2275,6 +2275,10 @@ legend {
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 12px 14px;
+  }
+
+  .preview-toolbar > div:first-child {
+    display: none;
   }
 
   .project-switcher {
@@ -2333,7 +2337,7 @@ legend {
   }
 
   #previewCanvas {
-    min-height: 160px;
+    min-height: 220px;
   }
 
   .control-panel .title-block {
@@ -2418,7 +2422,7 @@ legend {
   }
 
   .preview-panel {
-    grid-template-rows: auto minmax(125px, 22dvh);
+    grid-template-rows: auto minmax(210px, 28dvh);
   }
 
   .preview-toolbar .eyebrow {
@@ -2457,7 +2461,7 @@ legend {
   }
 
   #previewCanvas {
-    min-height: 125px;
+    min-height: 210px;
   }
 
   .field {

@@ -84,8 +84,8 @@ export class MeshPreviewRenderer {
 
   resize() {
     const rect = this.canvas.getBoundingClientRect();
-    const width = Math.max(320, Math.floor(rect.width));
-    const height = Math.max(260, Math.floor(rect.height));
+    const width = Math.max(1, Math.floor(rect.width));
+    const height = Math.max(1, Math.floor(rect.height));
     const targetPixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
     if (this.renderer.getPixelRatio() !== targetPixelRatio) {
       this.renderer.setPixelRatio(targetPixelRatio);
