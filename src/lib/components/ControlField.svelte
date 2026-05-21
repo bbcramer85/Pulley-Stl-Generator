@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte";
   import {
     fieldUnitLabel,
     formatControlValue,
@@ -18,7 +17,6 @@
   $: bounds = field?.type === "number" || !field?.type ? inputBounds(field, unit, engine) : null;
   $: displayValue = formatControlValue(value, field, unit, engine);
   $: unitLabel = fieldUnitLabel(field, unit, engine);
-  let focusScrollCleanup = () => {};
 
   function handleInput(event) {
     const nextValue = parseControlValue(event.currentTarget.value, field, unit, engine, value);
@@ -34,90 +32,6 @@
     const nextValue = parseControlValue(event.currentTarget.value, field, unit, engine, value);
     onFieldChange(field.key, nextValue);
   }
-
-  function keepFieldAboveKeyboard(target) {
-    if (!window.matchMedia("(max-width: 900px)").matches) return;
-    focusScrollCleanup();
-    const fieldElement = target.closest(".field") || target;
-    const viewport = window.visualViewport;
-    let disposed = false;
-
-    const scrollWhenReady = () => {
-      if (disposed) return;
-      window.requestAnimationFrame(() => {
-        if (!disposed) scrollFieldIntoSafeArea(fieldElement);
-      });
-    };
-
-    const timers = [80, 280, 650, 1000].map((delay) => window.setTimeout(scrollWhenReady, delay));
-    const stopListeningTimer = window.setTimeout(() => {
-      viewport?.removeEventListener("resize", scrollWhenReady);
-      viewport?.removeEventListener("scroll", scrollWhenReady);
-    }, 1200);
-
-    viewport?.addEventListener("resize", scrollWhenReady);
-    viewport?.addEventListener("scroll", scrollWhenReady);
-    focusScrollCleanup = () => {
-      disposed = true;
-      timers.forEach((timer) => window.clearTimeout(timer));
-      window.clearTimeout(stopListeningTimer);
-      viewport?.removeEventListener("resize", scrollWhenReady);
-      viewport?.removeEventListener("scroll", scrollWhenReady);
-      focusScrollCleanup = () => {};
-    };
-    scrollWhenReady();
-  }
-
-  function scrollFieldIntoSafeArea(fieldElement) {
-    if (!fieldElement?.isConnected) return;
-
-    const viewport = window.visualViewport;
-    const viewportTop = viewport?.offsetTop ?? 0;
-    const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight);
-    const previewPanel = document.querySelector(".preview-panel");
-    const previewRect = previewPanel?.getBoundingClientRect();
-    const previewBottom =
-      previewPanel && window.getComputedStyle(previewPanel).position === "sticky" && previewRect
-        ? previewRect.bottom
-        : viewportTop;
-
-    const safeTop = Math.max(viewportTop + 12, previewBottom + 12);
-    const safeBottom = viewportBottom - 18;
-    const rect = fieldElement.getBoundingClientRect();
-
-    if (safeBottom <= safeTop + 72) {
-      fieldElement.scrollIntoView({ block: "center", behavior: "smooth" });
-      return;
-    }
-
-    let scrollDelta = 0;
-    if (rect.bottom > safeBottom) {
-      scrollDelta = rect.bottom - safeBottom;
-    }
-    if (rect.top - scrollDelta < safeTop) {
-      scrollDelta = rect.top - safeTop;
-    }
-
-    if (Math.abs(scrollDelta) > 1) {
-      window.scrollBy({ top: scrollDelta, behavior: "auto" });
-    }
-  }
-
-  function handleFocus(event) {
-    keepFieldAboveKeyboard(event.currentTarget);
-  }
-
-  function handleBlur() {
-    window.setTimeout(() => {
-      if (!document.activeElement?.closest(".control-panel")) {
-        focusScrollCleanup();
-      }
-    }, 0);
-  }
-
-  onDestroy(() => {
-    focusScrollCleanup();
-  });
 </script>
 
 <label
@@ -157,8 +71,6 @@
         step={bounds.step}
         value={displayValue}
         disabled={!active}
-        on:focus={handleFocus}
-        on:blur={handleBlur}
         on:input={handleInput}
       />
       {#if unitLabel}
