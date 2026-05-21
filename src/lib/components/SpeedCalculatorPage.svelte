@@ -774,6 +774,10 @@
             </div>
           </div>
 
+          <div class="rpm-render-creator">
+            <CreatorCard />
+          </div>
+
           <div class="rpm-animation-stack rpm-sequence-view tractor-sequence">
             <svg
               class="rpm-stage-svg tractor-svg tractor-page-svg"
@@ -1095,6 +1099,10 @@
             </div>
 
           </div>
+        </div>
+
+        <div class="rpm-render-creator">
+          <CreatorCard />
         </div>
 
         <div class="rpm-animation-stack rpm-sequence-view">
