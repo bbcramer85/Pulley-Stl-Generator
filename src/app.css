@@ -2086,23 +2086,26 @@ legend {
   .rpm-workspace,
   .tractor-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(min(470px, 72dvh), 72dvh) minmax(0, 1fr);
+    grid-template-rows: clamp(330px, 50dvh, 430px) minmax(0, 1fr);
+    gap: 10px;
     height: 100%;
     min-height: 0;
     overflow: hidden;
-    padding: 12px;
+    padding: 10px 12px 12px;
   }
 
   .rpm-output {
     order: -1;
     min-height: 0;
     overflow: hidden;
+    padding: 8px;
   }
 
   .rpm-controls {
     min-height: 0;
     overflow: hidden auto;
     overscroll-behavior: contain;
+    padding: 14px;
     padding-bottom: max(24px, env(safe-area-inset-bottom));
     -webkit-overflow-scrolling: touch;
   }
@@ -2113,15 +2116,50 @@ legend {
   }
 
   .rpm-animation-panel {
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .rpm-animation-header {
+    display: grid;
+    gap: 6px;
+    padding: 7px 8px;
+  }
+
+  .rpm-animation-header > div:first-child,
+  .rpm-affiliate-rotator {
     display: none;
   }
 
-  .rpm-affiliate-rotator {
-    display: none;
+  .rpm-display-tools {
+    justify-items: stretch;
+    width: 100%;
+  }
+
+  .rpm-header-render-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .rpm-toolbar-note {
+    min-height: 28px;
+    padding: 5px 8px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .rpm-display-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 1px;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rpm-display-tabs button {
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 4px 8px;
   }
 
   .rpm-animation-stack,
@@ -2151,12 +2189,12 @@ legend {
   .linked-belt-svg,
   .rpm-sequence-view .linked-belt-svg {
     height: 100%;
-    min-height: clamp(360px, 60dvh, 520px);
+    min-height: 0;
   }
 
   .tractor-page-svg {
     height: 100%;
-    min-height: clamp(360px, 60dvh, 520px);
+    min-height: 0;
   }
 
   .control-panel {
@@ -2402,12 +2440,20 @@ legend {
     grid-template-columns: 1fr;
   }
 
+  .rpm-header-render-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
   .rpm-stage-toggle,
   .rpm-remove,
   .rpm-inline-toggle,
   .rpm-toolbar-note {
     width: 100%;
     justify-content: center;
+  }
+
+  .rpm-header-render-controls .rpm-toolbar-note {
+    width: auto;
   }
 }
 
