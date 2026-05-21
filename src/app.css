@@ -2071,13 +2071,54 @@ legend {
 
   .calculator-shell {
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
     -webkit-overflow-scrolling: touch;
   }
 
   .rpm-workspace,
   .tractor-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(250px, 40dvh) minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
     padding: 12px;
+  }
+
+  .rpm-output {
+    order: -1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .rpm-controls {
+    min-height: 0;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rpm-live-display,
+  .rpm-animation-panel {
+    min-height: 0;
+  }
+
+  .rpm-affiliate-rotator {
+    display: none;
+  }
+
+  .rpm-stage-svg {
+    min-height: clamp(110px, 18dvh, 170px);
+  }
+
+  .linked-belt-svg,
+  .rpm-sequence-view .linked-belt-svg {
+    min-height: clamp(150px, 25dvh, 220px);
+  }
+
+  .tractor-page-svg {
+    min-height: clamp(160px, 26dvh, 240px);
   }
 
   .control-panel {
