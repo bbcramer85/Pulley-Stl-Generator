@@ -2078,7 +2078,7 @@ legend {
   .rpm-workspace,
   .tractor-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(250px, 40dvh) minmax(0, 1fr);
+    grid-template-rows: minmax(min(380px, 58dvh), 58dvh) minmax(0, 1fr);
     height: 100%;
     min-height: 0;
     overflow: hidden;
@@ -2109,16 +2109,16 @@ legend {
   }
 
   .rpm-stage-svg {
-    min-height: clamp(110px, 18dvh, 170px);
+    min-height: clamp(150px, 24dvh, 230px);
   }
 
   .linked-belt-svg,
   .rpm-sequence-view .linked-belt-svg {
-    min-height: clamp(150px, 25dvh, 220px);
+    min-height: clamp(240px, 36dvh, 340px);
   }
 
   .tractor-page-svg {
-    min-height: clamp(160px, 26dvh, 240px);
+    min-height: clamp(250px, 38dvh, 360px);
   }
 
   .control-panel {
