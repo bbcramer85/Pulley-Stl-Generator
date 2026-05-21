@@ -32,6 +32,54 @@
     const nextValue = parseControlValue(event.currentTarget.value, field, unit, engine, value);
     onFieldChange(field.key, nextValue);
   }
+
+  function keepFieldAboveKeyboard(target) {
+    if (!window.matchMedia("(max-width: 900px)").matches) return;
+    const fieldElement = target.closest(".field") || target;
+    const delays = [60, 260, 520];
+    delays.forEach((delay) => {
+      window.setTimeout(() => scrollFieldIntoSafeArea(fieldElement), delay);
+    });
+  }
+
+  function scrollFieldIntoSafeArea(fieldElement) {
+    if (!fieldElement?.isConnected) return;
+
+    const viewport = window.visualViewport;
+    const viewportTop = viewport?.offsetTop ?? 0;
+    const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight);
+    const previewPanel = document.querySelector(".preview-panel");
+    const previewRect = previewPanel?.getBoundingClientRect();
+    const previewBottom =
+      previewPanel && window.getComputedStyle(previewPanel).position === "sticky" && previewRect
+        ? previewRect.bottom
+        : viewportTop;
+
+    const safeTop = Math.max(viewportTop + 12, previewBottom + 12);
+    const safeBottom = viewportBottom - 18;
+    const rect = fieldElement.getBoundingClientRect();
+
+    if (safeBottom <= safeTop + 72) {
+      fieldElement.scrollIntoView({ block: "center", behavior: "smooth" });
+      return;
+    }
+
+    let scrollDelta = 0;
+    if (rect.bottom > safeBottom) {
+      scrollDelta = rect.bottom - safeBottom;
+    }
+    if (rect.top - scrollDelta < safeTop) {
+      scrollDelta = rect.top - safeTop;
+    }
+
+    if (Math.abs(scrollDelta) > 1) {
+      window.scrollBy({ top: scrollDelta, behavior: "smooth" });
+    }
+  }
+
+  function handleFocus(event) {
+    keepFieldAboveKeyboard(event.currentTarget);
+  }
 </script>
 
 <label
@@ -71,6 +119,7 @@
         step={bounds.step}
         value={displayValue}
         disabled={!active}
+        on:focus={handleFocus}
         on:input={handleInput}
       />
       {#if unitLabel}

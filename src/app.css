@@ -2311,3 +2311,32 @@ legend {
     justify-content: center;
   }
 }
+
+@media (max-width: 900px) {
+  .control-panel {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  .control-panel .field:focus-within {
+    scroll-margin-top: calc(26vh + 92px);
+    scroll-margin-bottom: 42vh;
+  }
+
+  .control-panel:focus-within + .preview-panel {
+    grid-template-rows: auto minmax(160px, 26vh);
+  }
+
+  .control-panel:focus-within + .preview-panel .preview-toolbar {
+    gap: 8px;
+    padding-block: 10px;
+  }
+
+  .control-panel:focus-within + .preview-panel .project-switcher,
+  .control-panel:focus-within + .preview-panel .metrics {
+    display: none;
+  }
+
+  .control-panel:focus-within + .preview-panel #previewCanvas {
+    min-height: 160px;
+  }
+}
