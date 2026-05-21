@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from "svelte";
   import {
     fieldUnitLabel,
     formatControlValue,
@@ -17,6 +18,7 @@
   $: bounds = field?.type === "number" || !field?.type ? inputBounds(field, unit, engine) : null;
   $: displayValue = formatControlValue(value, field, unit, engine);
   $: unitLabel = fieldUnitLabel(field, unit, engine);
+  let focusScrollCleanup = () => {};
 
   function handleInput(event) {
     const nextValue = parseControlValue(event.currentTarget.value, field, unit, engine, value);
@@ -35,11 +37,35 @@
 
   function keepFieldAboveKeyboard(target) {
     if (!window.matchMedia("(max-width: 900px)").matches) return;
+    focusScrollCleanup();
     const fieldElement = target.closest(".field") || target;
-    const delays = [60, 260, 520];
-    delays.forEach((delay) => {
-      window.setTimeout(() => scrollFieldIntoSafeArea(fieldElement), delay);
-    });
+    const viewport = window.visualViewport;
+    let disposed = false;
+
+    const scrollWhenReady = () => {
+      if (disposed) return;
+      window.requestAnimationFrame(() => {
+        if (!disposed) scrollFieldIntoSafeArea(fieldElement);
+      });
+    };
+
+    const timers = [80, 280, 650, 1000].map((delay) => window.setTimeout(scrollWhenReady, delay));
+    const stopListeningTimer = window.setTimeout(() => {
+      viewport?.removeEventListener("resize", scrollWhenReady);
+      viewport?.removeEventListener("scroll", scrollWhenReady);
+    }, 1200);
+
+    viewport?.addEventListener("resize", scrollWhenReady);
+    viewport?.addEventListener("scroll", scrollWhenReady);
+    focusScrollCleanup = () => {
+      disposed = true;
+      timers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(stopListeningTimer);
+      viewport?.removeEventListener("resize", scrollWhenReady);
+      viewport?.removeEventListener("scroll", scrollWhenReady);
+      focusScrollCleanup = () => {};
+    };
+    scrollWhenReady();
   }
 
   function scrollFieldIntoSafeArea(fieldElement) {
@@ -73,13 +99,25 @@
     }
 
     if (Math.abs(scrollDelta) > 1) {
-      window.scrollBy({ top: scrollDelta, behavior: "smooth" });
+      window.scrollBy({ top: scrollDelta, behavior: "auto" });
     }
   }
 
   function handleFocus(event) {
     keepFieldAboveKeyboard(event.currentTarget);
   }
+
+  function handleBlur() {
+    window.setTimeout(() => {
+      if (!document.activeElement?.closest(".control-panel")) {
+        focusScrollCleanup();
+      }
+    }, 0);
+  }
+
+  onDestroy(() => {
+    focusScrollCleanup();
+  });
 </script>
 
 <label
@@ -120,6 +158,7 @@
         value={displayValue}
         disabled={!active}
         on:focus={handleFocus}
+        on:blur={handleBlur}
         on:input={handleInput}
       />
       {#if unitLabel}

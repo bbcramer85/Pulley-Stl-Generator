@@ -2323,6 +2323,9 @@ legend {
   }
 
   .control-panel:focus-within + .preview-panel {
+    position: static;
+    top: auto;
+    z-index: auto;
     grid-template-rows: auto minmax(160px, 26vh);
   }
 
@@ -2338,5 +2341,7 @@ legend {
 
   .control-panel:focus-within + .preview-panel #previewCanvas {
     min-height: 160px;
+    touch-action: pan-y;
+    pointer-events: none;
   }
 }
