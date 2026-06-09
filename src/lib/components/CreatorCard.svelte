@@ -1,7 +1,18 @@
+<script>
+  const desktopFacebookUrl = "https://www.facebook.com/CrankinCramers/";
+  const mobileFacebookUrl = "https://mbasic.facebook.com/CrankinCramers/";
+  const userAgent = typeof window !== "undefined" ? window.navigator.userAgent : "";
+  const isNarrowViewport = typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+  const isMobileBrowser = isNarrowViewport || /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
+
+  const facebookUrl = isMobileBrowser ? mobileFacebookUrl : desktopFacebookUrl;
+  const facebookTarget = isMobileBrowser ? "_self" : "_blank";
+</script>
+
 <a
   class="creator-card"
-  href="https://www.facebook.com/CrankinCramers/"
-  target="_top"
+  href={facebookUrl}
+  target={facebookTarget}
   rel="noopener noreferrer"
   aria-label="Open Crankin Cramer's on Facebook"
 >
