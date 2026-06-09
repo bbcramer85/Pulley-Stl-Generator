@@ -1,12 +1,20 @@
 <script>
   const desktopFacebookUrl = "https://www.facebook.com/CrankinCramers/";
-  const mobileFacebookUrl = "https://mbasic.facebook.com/CrankinCramers/";
+  const mobileFacebookUrl = "https://m.facebook.com/CrankinCramers/";
+  const androidFacebookUrl = `intent://www.facebook.com/CrankinCramers/#Intent;scheme=https;package=com.facebook.katana;S.browser_fallback_url=${encodeURIComponent(mobileFacebookUrl)};end`;
   const userAgent = typeof window !== "undefined" ? window.navigator.userAgent : "";
   const isNarrowViewport = typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+  const isAndroidBrowser = /Android/i.test(userAgent);
   const isMobileBrowser = isNarrowViewport || /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
 
-  const facebookUrl = isMobileBrowser ? mobileFacebookUrl : desktopFacebookUrl;
+  const facebookUrl = isAndroidBrowser ? androidFacebookUrl : isMobileBrowser ? mobileFacebookUrl : desktopFacebookUrl;
   const facebookTarget = isMobileBrowser ? "_self" : "_blank";
+
+  function openFacebook(event) {
+    if (!isMobileBrowser) return;
+    event.preventDefault();
+    window.location.href = facebookUrl;
+  }
 </script>
 
 <a
@@ -15,6 +23,7 @@
   target={facebookTarget}
   rel="noopener noreferrer"
   aria-label="Open Crankin Cramer's on Facebook"
+  on:click={openFacebook}
 >
   <span class="creator-avatar">
     <img
