@@ -2510,42 +2510,42 @@ legend {
 }
 
 @media (max-width: 900px) {
-  .workspace:has(.control-panel:focus-within) {
+  .workspace:has(.control-panel .controls:focus-within) {
     grid-template-rows: minmax(0, 1fr);
   }
 
-  .workspace:has(.control-panel:focus-within) .workspace-nav {
+  .workspace:has(.control-panel .controls:focus-within) .workspace-nav {
     display: none;
   }
 
-  .workspace:has(.control-panel:focus-within) .app-shell {
+  .workspace:has(.control-panel .controls:focus-within) .app-shell {
     gap: 8px;
     padding-block: 6px;
   }
 
-  .control-panel:focus-within + .preview-panel {
+  .control-panel:has(.controls:focus-within) + .preview-panel {
     grid-template-rows: auto minmax(80px, 14dvh);
   }
 
-  .control-panel:focus-within + .preview-panel .preview-toolbar {
+  .control-panel:has(.controls:focus-within) + .preview-panel .preview-toolbar {
     gap: 8px;
     padding-block: 10px;
   }
 
-  .control-panel:focus-within + .preview-panel .project-switcher,
-  .control-panel:focus-within + .preview-panel .metrics {
+  .control-panel:has(.controls:focus-within) + .preview-panel .project-switcher,
+  .control-panel:has(.controls:focus-within) + .preview-panel .metrics {
     display: none;
   }
 
-  .control-panel:focus-within + .preview-panel #previewCanvas {
+  .control-panel:has(.controls:focus-within) + .preview-panel #previewCanvas {
     min-height: 80px;
   }
 
-  .app-shell.dxf-workspace .control-panel:focus-within + .preview-panel {
+  .app-shell.dxf-workspace .control-panel:has(.controls:focus-within) + .preview-panel {
     grid-template-rows: auto minmax(210px, 28dvh);
   }
 
-  .app-shell.dxf-workspace .control-panel:focus-within + .preview-panel #previewCanvas {
+  .app-shell.dxf-workspace .control-panel:has(.controls:focus-within) + .preview-panel #previewCanvas {
     min-height: 210px;
   }
 }
