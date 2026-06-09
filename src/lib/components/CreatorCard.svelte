@@ -1,7 +1,7 @@
 <a
   class="creator-card"
   href="https://www.facebook.com/CrankinCramers/"
-  target="_blank"
+  target="_top"
   rel="noopener noreferrer"
   aria-label="Open Crankin Cramer's on Facebook"
 >
