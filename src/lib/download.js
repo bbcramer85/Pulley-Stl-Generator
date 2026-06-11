@@ -1,3 +1,5 @@
+import { createOnePieceStlMesh } from "./manifold-union.js";
+
 export function isBlockingWarning(message) {
   return !message.startsWith("Recommended change:");
 }
@@ -13,7 +15,7 @@ export function triggerDownload(blob, fileName) {
   window.setTimeout(() => URL.revokeObjectURL(url), 300);
 }
 
-export function downloadModel({ engine, project, params, mesh, unit }) {
+export async function downloadModel({ engine, project, params, mesh, unit }) {
   const unitOption = engine.unitOptions[unit] || engine.unitOptions.in;
   const displayFactor = unitOption.factorFromInch || 1;
   const fileDimensionValue = params[project.fileDimensionKey];
@@ -35,10 +37,14 @@ export function downloadModel({ engine, project, params, mesh, unit }) {
 
   const fileName = `${project.filePrefix}-${cleanDimension}${unit}.stl`;
   const stlScale = 25.4;
-  const blob = new Blob([engine.meshToAsciiStl(mesh, project.stlName, stlScale)], {
+  const exportResult = project.onePieceStl ? await createOnePieceStlMesh(mesh, { scale: stlScale }) : null;
+  const exportMesh = exportResult?.mesh || mesh;
+  const exportScale = exportResult ? 1 : stlScale;
+  const blob = new Blob([engine.meshToAsciiStl(exportMesh, project.stlName, exportScale)], {
     type: "model/stl;charset=utf-8",
   });
   triggerDownload(blob, fileName);
+  return exportResult;
 }
 
 function scaleDxfMesh(mesh, factor) {

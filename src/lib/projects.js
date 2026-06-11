@@ -25,6 +25,7 @@ export function createProjectConfigs() {
       filePrefix: "flatbelt-pulley",
       stlName: "flatbelt_pulley",
       fileDimensionKey: "diameter",
+      onePieceStl: true,
     },
     vBeltPulley: {
       label: "V-Belt Pulley",
@@ -36,6 +37,7 @@ export function createProjectConfigs() {
       filePrefix: "vbelt-pulley",
       stlName: "vbelt_pulley",
       fileDimensionKey: "vOuterDiameter",
+      onePieceStl: true,
     },
     sprocket: {
       label: "Sprocket",
@@ -47,6 +49,7 @@ export function createProjectConfigs() {
       filePrefix: "sprocket",
       stlName: "sprocket",
       fileDimensionKey: "sprocketToothCount",
+      onePieceStl: true,
     },
     straightCutGear: {
       label: "Straight Cut Gear",
@@ -58,6 +61,7 @@ export function createProjectConfigs() {
       filePrefix: "straight-cut-gear",
       stlName: "straight_cut_gear",
       fileDimensionKey: "gearToothCount",
+      onePieceStl: true,
     },
     bevelGear: {
       label: "Bevel Gear",
@@ -69,6 +73,7 @@ export function createProjectConfigs() {
       filePrefix: "bevel-gear",
       stlName: "bevel_gear",
       fileDimensionKey: "bevelToothCount",
+      onePieceStl: true,
     },
     shaftSpacer: {
       label: "Shaft Spacer",

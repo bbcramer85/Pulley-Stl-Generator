@@ -26,6 +26,8 @@
   let derived = null;
   let warnings = [];
   let statusOverride = "";
+  let statusOverrideVariant = "";
+  let isExporting = false;
   let view = {
     rotX: -0.58,
     rotZ: 0.72,
@@ -38,8 +40,9 @@
   $: engine.setUnit(unit);
   $: metricRows = derived && unit ? activeProject.metrics(derived) : [];
   $: blockingWarnings = warnings.filter(isBlockingWarning);
-  $: canDownload = Boolean(mesh) && blockingWarnings.length === 0;
-  $: statusVariant = blockingWarnings.length > 0 ? "warning" : warnings.length > 0 ? "recommendation" : "";
+  $: canDownload = Boolean(mesh) && blockingWarnings.length === 0 && !isExporting;
+  $: statusVariant =
+    statusOverrideVariant || (blockingWarnings.length > 0 ? "warning" : warnings.length > 0 ? "recommendation" : "");
   $: statusText = statusOverride || (warnings.length > 0 ? warnings.join(" ") : "Ready to export.");
   $: previewContext = {
     projectKey,
@@ -52,7 +55,10 @@
     const key = options.projectKey || projectKey;
     const project = projectConfigs[key];
     if (!project) return;
-    if (options.clearStatus !== false) statusOverride = "";
+    if (options.clearStatus !== false) {
+      statusOverride = "";
+      statusOverrideVariant = "";
+    }
 
     try {
       engine.setUnit(unit);
@@ -131,15 +137,32 @@
     fitDxfPreviewAfterLayout(activeProject);
   }
 
-  function handleDownload() {
+  async function handleDownload() {
     if (!canDownload) return;
-    downloadModel({
-      engine,
-      project: activeProject,
-      params: activeParams,
-      mesh,
-      unit,
-    });
+    isExporting = true;
+    statusOverrideVariant = "";
+    if (activeProject.onePieceStl) {
+      statusOverride = "Preparing one-piece STL...";
+    }
+
+    try {
+      const exportResult = await downloadModel({
+        engine,
+        project: activeProject,
+        params: activeParams,
+        mesh,
+        unit,
+      });
+      statusOverride = exportResult
+        ? `One-piece STL ready. Joined ${exportResult.sourceComponentCount} shells into ${exportResult.unionedComponentCount} closed mesh.`
+        : "Download started.";
+    } catch (error) {
+      console.error(error);
+      statusOverride = error?.message || "Unable to prepare this download.";
+      statusOverrideVariant = "warning";
+    } finally {
+      isExporting = false;
+    }
   }
 
   function clearHeadGasketDeletedForField(fieldKey) {
@@ -175,6 +198,7 @@
 
     rebuild(activeParams, { clearStatus: false });
     fitDxfPreviewAfterLayout(activeProject);
+    statusOverrideVariant = "";
     statusOverride = `${target.type === "bolt" ? "Bolt hole" : "Slot"} removed from this gasket pattern. Reset restores removed gasket features.`;
   }
 
