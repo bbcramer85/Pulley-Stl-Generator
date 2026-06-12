@@ -621,17 +621,17 @@ const shaftSpacerControlGroups = [
 
 const lineshaftHangerDefaults = {
   hangerFrameStyle: "aFrame",
-  hangerBoreDiameter: 0.5,
-  hangerHousingOuterDiameter: 1.45,
-  hangerHousingWidth: 0.85,
+  hangerBoreDiameter: 0.3545,
+  hangerHousingOuterDiameter: 0.75,
+  hangerHousingWidth: 0.5,
   hangerCenterHeight: 3,
-  hangerFrameDepth: 0.58,
-  hangerLegThickness: 0.28,
-  hangerLegFootInset: 0.55,
+  hangerFrameDepth: 0.5,
+  hangerLegThickness: 0.125,
+  hangerLegFootInset: 0.288,
   hangerFootSpacing: 2.65,
   hangerFootPadDiameter: 0.82,
   hangerBoltHoleDiameter: 0.22,
-  hangerBaseDepth: 0.82,
+  hangerBaseDepth: 0.5,
   hangerBaseThickness: 0.22,
 };
 
