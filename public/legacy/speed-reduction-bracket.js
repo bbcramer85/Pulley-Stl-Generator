@@ -27,8 +27,8 @@ function validateSpeedReductionBracket(raw) {
   p.reducerSupportStyle = p.reducerSupportStyle === "curved" ? "curved" : "straight";
   p.reducerSupportCurve = reducerClampSignedCurve(p.reducerSupportCurve, 0);
   p.reducerSupportCurve1 = reducerClampSignedCurve(p.reducerSupportCurve1, p.reducerSupportCurve);
-  p.reducerSupportCurve2 = reducerClampSignedCurve(p.reducerSupportCurve2, -p.reducerSupportCurve);
-  p.reducerSupportCurve3 = reducerClampSignedCurve(p.reducerSupportCurve3, 0);
+  p.reducerSupportCurve2 = reducerClampSignedCurve(p.reducerSupportCurve2, p.reducerSupportCurve);
+  p.reducerSupportCurve3 = reducerClampSignedCurve(p.reducerSupportCurve3, p.reducerSupportCurve);
   p.reducerTopSupportCurve1 = reducerClampSignedCurve(p.reducerTopSupportCurve1, 0);
   p.reducerTopSupportCurve2 = reducerClampSignedCurve(p.reducerTopSupportCurve2, 0);
   p.reducerStage1Auto = p.reducerStage1Auto !== false;

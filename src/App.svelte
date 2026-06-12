@@ -13,6 +13,18 @@
   const engine = legacy();
   const projectConfigs = createProjectConfigs();
   const initialParams = Object.fromEntries(projectOrder.map((key) => [key, cloneDefaults(projectConfigs[key])]));
+  const defaultMeshView = {
+    rotX: -0.58,
+    rotZ: 0.72,
+    zoom: 1,
+  };
+  const projectPreviewViews = {
+    speedReductionBracket: {
+      rotX: 0,
+      rotZ: 0,
+      zoom: 1,
+    },
+  };
 
   let projectKey = "flatBeltPulley";
   let workspace = "models";
@@ -29,9 +41,7 @@
   let statusOverrideVariant = "";
   let isExporting = false;
   let view = {
-    rotX: -0.58,
-    rotZ: 0.72,
-    zoom: 1,
+    ...defaultMeshView,
     showDxfDimensions: false,
   };
 
@@ -92,6 +102,17 @@
     return `${(value * option.factorFromInch).toFixed(option.decimals)} ${option.label}`;
   }
 
+  function defaultPreviewViewFor(key = projectKey) {
+    return projectPreviewViews[key] || defaultMeshView;
+  }
+
+  function applyDefaultPreviewView(key = projectKey) {
+    view = {
+      ...view,
+      ...defaultPreviewViewFor(key),
+    };
+  }
+
   function handleProjectChange(nextProjectKey) {
     if (!projectConfigs[nextProjectKey] || nextProjectKey === projectKey) {
       rebuild();
@@ -100,6 +121,7 @@
     }
     const nextProject = projectConfigs[nextProjectKey];
     projectKey = nextProjectKey;
+    applyDefaultPreviewView(nextProjectKey);
     rebuild(paramsByProject[nextProjectKey], { projectKey: nextProjectKey });
     fitDxfPreviewAfterLayout(nextProject);
   }
@@ -139,6 +161,7 @@
     };
     view = {
       ...view,
+      ...defaultPreviewViewFor(projectKey),
       showDxfDimensions: false,
     };
     rebuild(nextParams);
@@ -234,9 +257,7 @@
   function resetPreviewView() {
     view = {
       ...view,
-      rotX: -0.58,
-      rotZ: 0.72,
-      zoom: 1,
+      ...defaultPreviewViewFor(projectKey),
     };
   }
 
@@ -252,7 +273,9 @@
     }
 
     workspace = window.location.hash === "#gaskets" ? "gaskets" : "models";
-    alignProjectToWorkspace();
+    if (alignProjectToWorkspace()) {
+      applyDefaultPreviewView(projectKey);
+    }
     if (projectKey !== previousProjectKey && mesh) {
       rebuild(paramsByProject[projectKey], { projectKey });
       fitDxfPreviewAfterLayout(projectConfigs[projectKey]);
@@ -274,6 +297,7 @@
     const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
     window.history.replaceState(null, "", nextUrl);
     if (projectKey !== previousProjectKey) {
+      applyDefaultPreviewView(projectKey);
       rebuild(paramsByProject[projectKey], { projectKey });
       fitDxfPreviewAfterLayout(projectConfigs[projectKey]);
     }
