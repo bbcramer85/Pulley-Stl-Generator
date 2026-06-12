@@ -109,16 +109,6 @@ function generateLineshaftHangerMesh(params) {
   } else {
     addLineshaftLeg(mesh, -1, params, housingR, footX, centerY, baseY1, frameZ0, frameZ1, overlap);
     addLineshaftLeg(mesh, 1, params, housingR, footX, centerY, baseY1, frameZ0, frameZ1, overlap);
-
-    addLineshaftCuboid(
-      mesh,
-      -housingR * 0.82,
-      housingR * 0.82,
-      centerY - housingR - params.hangerLegThickness * 0.22,
-      centerY - housingR + params.hangerLegThickness * 0.58,
-      frameZ0,
-      frameZ1
-    );
   }
 
   const repairCaps = closeBoundaryLoops(mesh);
