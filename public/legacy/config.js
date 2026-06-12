@@ -619,6 +619,61 @@ const shaftSpacerControlGroups = [
   },
 ];
 
+const lineshaftHangerDefaults = {
+  hangerFrameStyle: "aFrame",
+  hangerBoreDiameter: 0.5,
+  hangerHousingOuterDiameter: 1.45,
+  hangerHousingWidth: 0.85,
+  hangerCenterHeight: 3,
+  hangerFrameDepth: 0.58,
+  hangerLegThickness: 0.28,
+  hangerLegFootInset: 0.55,
+  hangerFootSpacing: 2.65,
+  hangerFootPadDiameter: 0.82,
+  hangerBoltHoleDiameter: 0.22,
+  hangerBaseDepth: 0.82,
+  hangerBaseThickness: 0.22,
+};
+
+const lineshaftHangerControlGroups = [
+  {
+    title: "Bearing housing",
+    fields: [
+      { key: "hangerBoreDiameter", label: "Bushing hole", hint: "through hole for bearing or bushing", min: 0.0625, max: 6, step: 0.001 },
+      { key: "hangerHousingOuterDiameter", label: "Housing OD", hint: "outside diameter around the bore", min: 0.125, max: 12, step: 0.001 },
+      { key: "hangerHousingWidth", label: "Housing width", hint: "depth through the hanger body", min: 0.125, max: 8, step: 0.001 },
+      { key: "hangerCenterHeight", label: "Shaft center height", hint: "base bottom to bore center", min: 0.25, max: 24, step: 0.001 },
+    ],
+  },
+  {
+    title: "Frame",
+    fields: [
+      {
+        key: "hangerFrameStyle",
+        label: "Frame style",
+        hint: "choose two legs or one center post",
+        type: "select",
+        options: ["aFrame", "centerPost"],
+        optionLabels: { aFrame: "A frame", centerPost: "Center post" },
+        unit: "",
+      },
+      { key: "hangerFrameDepth", label: "Frame depth", hint: "front-to-back leg thickness", min: 0.0625, max: 8, step: 0.001 },
+      { key: "hangerLegThickness", label: "Leg thickness", hint: "side frame bar width", min: 0.04, max: 4, step: 0.001 },
+      { key: "hangerLegFootInset", label: "A-frame foot inset", hint: "moves leg feet inward from bolt holes", min: 0, max: 8, step: 0.001, showWhen: { key: "hangerFrameStyle", value: "aFrame" } },
+      { key: "hangerFootSpacing", label: "Foot spacing", hint: "mounting hole center distance", min: 0.25, max: 24, step: 0.001 },
+    ],
+  },
+  {
+    title: "Mounting feet",
+    fields: [
+      { key: "hangerFootPadDiameter", label: "Foot pad OD", hint: "round mounting pad outside size", min: 0.125, max: 8, step: 0.001 },
+      { key: "hangerBoltHoleDiameter", label: "Bolt hole", hint: "through mounting hole diameter", min: 0.01, max: 4, step: 0.001 },
+      { key: "hangerBaseDepth", label: "Base slab depth", hint: "solid bridge between round feet", min: 0.125, max: 12, step: 0.001 },
+      { key: "hangerBaseThickness", label: "Base thickness", hint: "mounting pad thickness", min: 0.03, max: 4, step: 0.001 },
+    ],
+  },
+];
+
 const headGasketDefaults = {
   gasketOuterDiameter: 4.5,
   gasketBoreDiameter: 3,
