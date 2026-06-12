@@ -49,10 +49,11 @@
 
     if (!webglRenderer || webglCanvas !== canvas) {
       disposeWebglRenderer();
-      webglRenderer = new MeshPreviewRenderer(canvas);
+      webglRenderer = new MeshPreviewRenderer(canvas, { showOutline: projectKey !== "lineshaftHanger" });
       webglCanvas = canvas;
     }
 
+    webglRenderer.setOptions({ showOutline: projectKey !== "lineshaftHanger" });
     webglRenderer.setMesh(mesh);
     webglRenderer.render(localView || view);
   }

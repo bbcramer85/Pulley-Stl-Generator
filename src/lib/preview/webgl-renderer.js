@@ -4,8 +4,9 @@ const MAX_PIXEL_RATIO = 1.6;
 const MODEL_PADDING = 1.18;
 
 export class MeshPreviewRenderer {
-  constructor(canvas) {
+  constructor(canvas, options = {}) {
     this.canvas = canvas;
+    this.showOutline = options.showOutline ?? true;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
@@ -50,6 +51,16 @@ export class MeshPreviewRenderer {
     this.scene.add(rimLight);
   }
 
+  setOptions(options = {}) {
+    const nextShowOutline = options.showOutline ?? true;
+    if (nextShowOutline === this.showOutline) return;
+
+    this.showOutline = nextShowOutline;
+    if (this.geometry) {
+      this.updateOutlineObject();
+    }
+  }
+
   setMesh(mesh) {
     if (this.mesh === mesh) return;
     this.mesh = mesh;
@@ -64,6 +75,17 @@ export class MeshPreviewRenderer {
 
     this.meshObject = new THREE.Mesh(this.geometry, this.material);
     this.group.add(this.meshObject);
+
+    this.updateOutlineObject();
+  }
+
+  updateOutlineObject() {
+    if (this.outlineObject) this.group.remove(this.outlineObject);
+    this.edgeGeometry?.dispose();
+    this.outlineObject = null;
+    this.edgeGeometry = null;
+
+    if (!this.showOutline || !this.geometry) return;
 
     this.edgeGeometry = new THREE.EdgesGeometry(this.geometry, 34);
     this.outlineObject = new THREE.LineSegments(this.edgeGeometry, this.outlineMaterial);
