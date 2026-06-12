@@ -132,8 +132,28 @@ function generateLineshaftHangerMesh(params) {
 function addLineshaftLeg(mesh, sign, params, housingR, footX, centerY, baseY, z0, z1, overlap) {
   const lower = [sign * (footX - params.hangerLegFootInset), baseY - overlap];
   const upper = [sign * housingR * 0.68, centerY - housingR * 0.18];
-  const path = lineshaftThickSegmentPath(lower, upper, params.hangerLegThickness);
+  const embeddedLower = extendLineshaftLegIntoBase(lower, upper, params, baseY, overlap);
+  const path = lineshaftThickSegmentPath(embeddedLower, upper, params.hangerLegThickness);
   addExtrudedPolygon(mesh, path, z0, z1);
+}
+
+function extendLineshaftLegIntoBase(lower, upper, params, baseY, overlap) {
+  const dx = upper[0] - lower[0];
+  const dy = upper[1] - lower[1];
+  const length = Math.max(0.000001, Math.hypot(dx, dy));
+  const capRise = Math.abs((dx / length) * params.hangerLegThickness * 0.5);
+  const desiredEmbed = Math.max(overlap + capRise + params.hangerLegThickness * 0.28, params.hangerLegThickness * 0.8);
+  const maxEmbed = Math.max(overlap, params.hangerBaseThickness - overlap * 0.5);
+  const targetY = baseY - Math.min(desiredEmbed, maxEmbed);
+
+  if (lower[1] <= targetY) return lower;
+
+  const backX = lower[0] - upper[0];
+  const backY = lower[1] - upper[1];
+  if (backY >= -0.000001) return [lower[0], targetY];
+
+  const extension = (lower[1] - targetY) / -backY;
+  return [lower[0] + backX * extension, targetY];
 }
 
 function addLineshaftCenterPost(mesh, params, boreR, housingR, centerY, baseY, z0, z1, overlap) {
