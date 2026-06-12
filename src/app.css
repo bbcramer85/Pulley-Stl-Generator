@@ -55,9 +55,9 @@ select {
 }
 
 .workspace-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto minmax(260px, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding: 12px 18px 0;
 }
@@ -65,6 +65,7 @@ select {
 .workspace-brand {
   display: grid;
   gap: 2px;
+  justify-self: start;
   min-width: 0;
 }
 
@@ -82,20 +83,24 @@ select {
 .workspace-switcher {
   display: inline-grid;
   grid-template-columns: repeat(4, minmax(0, auto));
+  justify-self: center;
   gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #eef2f1;
+  padding: 5px;
+  border: 1px solid #6f7b78;
+  border-radius: 10px;
+  background: #4f5b58;
+  box-shadow:
+    0 12px 28px rgba(23, 32, 31, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .workspace-switcher button {
   min-height: 34px;
   border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 6px 12px;
+  border-radius: 7px;
+  padding: 6px 14px;
   background: transparent;
-  color: var(--muted);
+  color: #edf3f1;
   cursor: pointer;
   font-size: 0.84rem;
   font-weight: 800;
@@ -103,14 +108,17 @@ select {
 }
 
 .workspace-switcher button.active {
-  background: var(--teal);
-  color: #ffffff;
+  background: #f2c766;
+  color: #17201f;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
 }
 
 .workspace-switcher button:not(.active):hover,
 .workspace-switcher button:not(.active):focus-visible {
-  border-color: var(--teal);
-  outline: 3px solid rgba(17, 120, 111, 0.13);
+  border-color: rgba(242, 199, 102, 0.55);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  outline: 3px solid rgba(242, 199, 102, 0.16);
 }
 
 .app-shell {
@@ -2058,12 +2066,38 @@ legend {
 
   .workspace-nav,
   .calculator-toolbar {
+    display: flex;
     align-items: flex-start;
     flex-direction: column;
   }
 
   .workspace-brand {
     display: none;
+  }
+
+  .workspace-switcher {
+    justify-self: auto;
+    border-color: var(--line);
+    background: #eef2f1;
+    box-shadow: none;
+  }
+
+  .workspace-switcher button {
+    color: var(--muted);
+  }
+
+  .workspace-switcher button.active {
+    background: var(--teal);
+    color: #ffffff;
+    box-shadow: none;
+  }
+
+  .workspace-switcher button:not(.active):hover,
+  .workspace-switcher button:not(.active):focus-visible {
+    border-color: var(--teal);
+    background: transparent;
+    color: var(--teal-dark);
+    outline: 3px solid rgba(17, 120, 111, 0.13);
   }
 
   .workspace:has(.calculator-shell:not([hidden])) {
