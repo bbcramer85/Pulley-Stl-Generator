@@ -81,7 +81,7 @@ select {
 
 .workspace-switcher {
   display: inline-grid;
-  grid-template-columns: repeat(3, minmax(0, auto));
+  grid-template-columns: repeat(4, minmax(0, auto));
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -2397,11 +2397,12 @@ legend {
 
   .workspace-switcher {
     width: 100%;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .workspace-switcher button {
-    padding-inline: 8px;
+    padding-inline: 6px;
+    font-size: 0.78rem;
   }
 
   .control-panel,

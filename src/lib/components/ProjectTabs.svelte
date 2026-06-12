@@ -3,11 +3,14 @@
 
   export let projects;
   export let activeKey;
+  export let projectKeys = projectOrder;
   export let onProjectChange = () => {};
+
+  $: visibleProjectKeys = projectKeys?.length ? projectKeys : projectOrder;
 </script>
 
 <div class="project-switcher" aria-label="Generator projects">
-  {#each projectOrder as key}
+  {#each visibleProjectKeys as key}
     {#if projects[key]}
       <button
         type="button"

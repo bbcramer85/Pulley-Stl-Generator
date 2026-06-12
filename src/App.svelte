@@ -7,7 +7,7 @@
   import SpeedCalculatorPage from "./lib/components/SpeedCalculatorPage.svelte";
   import { downloadModel, isBlockingWarning } from "./lib/download.js";
   import { legacy } from "./lib/legacy.js";
-  import { cloneDefaults, createProjectConfigs, projectOrder } from "./lib/projects.js";
+  import { cloneDefaults, createProjectConfigs, projectKeysByCategory, projectOrder } from "./lib/projects.js";
   import { applyLinkedPreset, normalizeParams } from "./lib/state/control-utils.js";
 
   const engine = legacy();
@@ -15,7 +15,7 @@
   const initialParams = Object.fromEntries(projectOrder.map((key) => [key, cloneDefaults(projectConfigs[key])]));
 
   let projectKey = "flatBeltPulley";
-  let workspace = "generator";
+  let workspace = "models";
   let unit = "in";
   let paramsByProject = initialParams;
   let deletedFeatures = {
@@ -50,6 +50,14 @@
     derived,
     formatDimension,
   };
+  $: visibleProjectKeys = projectKeysByCategory[workspace] || projectKeysByCategory.models;
+
+  function alignProjectToWorkspace(nextWorkspace = workspace) {
+    const projectKeys = projectKeysByCategory[nextWorkspace];
+    if (!projectKeys || projectKeys.includes(projectKey)) return false;
+    projectKey = projectKeys[0];
+    return true;
+  }
 
   function rebuild(nextParams = activeParams, options = {}) {
     const key = options.projectKey || projectKey;
@@ -233,18 +241,42 @@
   }
 
   function syncWorkspaceFromHash() {
+    const previousProjectKey = projectKey;
     if (["#calculator", "#rpm-calculator"].includes(window.location.hash)) {
       workspace = "speed";
       return;
     }
-    workspace = window.location.hash === "#tractor" ? "tractor" : "generator";
+    if (window.location.hash === "#tractor") {
+      workspace = "tractor";
+      return;
+    }
+
+    workspace = window.location.hash === "#gaskets" ? "gaskets" : "models";
+    alignProjectToWorkspace();
+    if (projectKey !== previousProjectKey && mesh) {
+      rebuild(paramsByProject[projectKey], { projectKey });
+      fitDxfPreviewAfterLayout(projectConfigs[projectKey]);
+    }
   }
 
   function setWorkspace(nextWorkspace) {
+    const previousProjectKey = projectKey;
     workspace = nextWorkspace;
-    const nextHash = nextWorkspace === "speed" ? "#rpm-calculator" : nextWorkspace === "tractor" ? "#tractor" : "";
+    alignProjectToWorkspace(nextWorkspace);
+    const nextHash =
+      nextWorkspace === "speed"
+        ? "#rpm-calculator"
+        : nextWorkspace === "tractor"
+          ? "#tractor"
+          : nextWorkspace === "gaskets"
+            ? "#gaskets"
+            : "";
     const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
     window.history.replaceState(null, "", nextUrl);
+    if (projectKey !== previousProjectKey) {
+      rebuild(paramsByProject[projectKey], { projectKey });
+      fitDxfPreviewAfterLayout(projectConfigs[projectKey]);
+    }
   }
 
   onMount(() => {
@@ -271,11 +303,19 @@
     <div class="workspace-switcher">
       <button
         type="button"
-        class:active={workspace === "generator"}
-        aria-current={workspace === "generator" ? "page" : undefined}
-        on:click={() => setWorkspace("generator")}
+        class:active={workspace === "models"}
+        aria-current={workspace === "models" ? "page" : undefined}
+        on:click={() => setWorkspace("models")}
       >
-        Generator
+        3D Models
+      </button>
+      <button
+        type="button"
+        class:active={workspace === "gaskets"}
+        aria-current={workspace === "gaskets" ? "page" : undefined}
+        on:click={() => setWorkspace("gaskets")}
+      >
+        Gaskets
       </button>
       <button
         type="button"
@@ -296,7 +336,7 @@
     </div>
   </nav>
 
-  {#if workspace === "generator"}
+  {#if workspace === "models" || workspace === "gaskets"}
     <div class="app-shell" class:dxf-workspace={activeProject.exportType === "dxf"}>
       <ControlPanel
         project={activeProject}
@@ -325,7 +365,12 @@
             <h2>{activeProject.previewTitle || "Mesh View"}</h2>
           </div>
 
-          <ProjectTabs projects={projectConfigs} activeKey={projectKey} onProjectChange={handleProjectChange} />
+          <ProjectTabs
+            projects={projectConfigs}
+            activeKey={projectKey}
+            projectKeys={visibleProjectKeys}
+            onProjectChange={handleProjectChange}
+          />
 
           <div class="preview-info">
             <MetricPills rows={metricRows} />

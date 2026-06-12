@@ -13,6 +13,23 @@ export const projectOrder = [
   "dripOilerGasket",
 ];
 
+export const projectKeysByCategory = {
+  models: [
+    "flatBeltPulley",
+    "vBeltPulley",
+    "sprocket",
+    "straightCutGear",
+    "bevelGear",
+    "shaftSpacer",
+    "lineshaftHanger",
+  ],
+  gaskets: ["headGasket", "ignitorGasket", "dripOilerGasket"],
+};
+
+export function projectCategoryForKey(projectKey) {
+  return Object.entries(projectKeysByCategory).find(([, keys]) => keys.includes(projectKey))?.[0] || "models";
+}
+
 export function createProjectConfigs() {
   const engine = legacy();
   return {
