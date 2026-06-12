@@ -67,7 +67,8 @@ export function getSelectOptionLabel(field, optionValue, engine) {
 }
 
 export function isFieldActive(field, params) {
-  return !field.showWhen || params[field.showWhen.key] === field.showWhen.value;
+  const matches = (condition) => params[condition.key] === condition.value;
+  return (!field.showWhen || matches(field.showWhen)) && (!field.showWhenAll || field.showWhenAll.every(matches));
 }
 
 export function normalizeParams(projectKey, params, unit, deletedFeatures) {
@@ -87,6 +88,10 @@ export function normalizeParams(projectKey, params, unit, deletedFeatures) {
 }
 
 export function applyLinkedPreset(fieldKey, fieldValue, params, engine) {
+  if (fieldKey.startsWith("reducer")) {
+    return applySpeedReductionLinks(fieldKey, params);
+  }
+
   if (fieldKey === "sprocketChainKey") {
     const preset = engine.sprocketChainPresets[fieldValue];
     if (!preset) return params;
@@ -118,4 +123,56 @@ export function applyLinkedPreset(fieldKey, fieldValue, params, engine) {
     };
   }
   return params;
+}
+
+function applySpeedReductionLinks(fieldKey, params) {
+  const nextParams = { ...params };
+  const stage1AutoFields = new Set([
+    "reducerPulley1Diameter",
+    "reducerPulley2Diameter",
+    "reducerShaft1Height",
+    "reducerShaft2Height",
+    "reducerStage1Auto",
+  ]);
+  const stage2AutoFields = new Set([
+    "reducerPulley2Diameter",
+    "reducerPulley3Diameter",
+    "reducerShaft2Height",
+    "reducerShaft3Height",
+    "reducerStage2Auto",
+  ]);
+
+  if (fieldKey === "reducerManualCenterDistance") nextParams.reducerStage1Auto = false;
+  if (fieldKey === "reducerManualCenterDistance2") nextParams.reducerStage2Auto = false;
+
+  if (nextParams.reducerStage1Auto !== false && stage1AutoFields.has(fieldKey)) {
+    nextParams.reducerManualCenterDistance = reducerAutoHorizontalOffset(
+      nextParams.reducerPulley1Diameter,
+      nextParams.reducerPulley2Diameter,
+      nextParams.reducerShaft1Height,
+      nextParams.reducerShaft2Height,
+    );
+  }
+
+  if (nextParams.reducerStage2Auto !== false && stage2AutoFields.has(fieldKey)) {
+    nextParams.reducerManualCenterDistance2 = reducerAutoHorizontalOffset(
+      nextParams.reducerPulley2Diameter,
+      nextParams.reducerPulley3Diameter,
+      nextParams.reducerShaft2Height,
+      nextParams.reducerShaft3Height,
+    );
+  }
+
+  return nextParams;
+}
+
+function reducerTouchingCenterDistance(firstDiameter, secondDiameter) {
+  return (Math.max(0.001, firstDiameter) + Math.max(0.001, secondDiameter)) / 2;
+}
+
+function reducerAutoHorizontalOffset(firstDiameter, secondDiameter, firstHeight, secondHeight) {
+  const centerDistance = reducerTouchingCenterDistance(firstDiameter, secondDiameter);
+  const dy = (Number(secondHeight) || 0) - (Number(firstHeight) || 0);
+  const squaredHorizontal = centerDistance * centerDistance - dy * dy;
+  return squaredHorizontal > 0 ? Math.sqrt(squaredHorizontal) : 0;
 }

@@ -24,6 +24,7 @@
   let resizeObserver = null;
 
   $: previewMode = mesh?.kind === "dxf" ? "dxf" : "mesh";
+  $: showMeshOutline = !["lineshaftHanger", "speedReductionBracket"].includes(projectKey);
   $: if (!dragging && view !== lastParentView) {
     localView = view;
     lastParentView = view;
@@ -49,11 +50,11 @@
 
     if (!webglRenderer || webglCanvas !== canvas) {
       disposeWebglRenderer();
-      webglRenderer = new MeshPreviewRenderer(canvas, { showOutline: projectKey !== "lineshaftHanger" });
+      webglRenderer = new MeshPreviewRenderer(canvas, { showOutline: showMeshOutline });
       webglCanvas = canvas;
     }
 
-    webglRenderer.setOptions({ showOutline: projectKey !== "lineshaftHanger" });
+    webglRenderer.setOptions({ showOutline: showMeshOutline });
     webglRenderer.setMesh(mesh);
     webglRenderer.render(localView || view);
   }

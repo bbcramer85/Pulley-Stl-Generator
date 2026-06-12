@@ -24,9 +24,12 @@ export class MeshPreviewRenderer {
 
     this.meshObject = null;
     this.outlineObject = null;
+    this.guideObject = null;
     this.geometry = null;
     this.edgeGeometry = null;
+    this.guideGeometry = null;
     this.bounds = null;
+    this.modelCenter = new THREE.Vector3();
 
     this.material = new THREE.MeshStandardMaterial({
       color: 0x8ec0a9,
@@ -40,6 +43,12 @@ export class MeshPreviewRenderer {
       transparent: true,
       opacity: 0.42,
       depthTest: true,
+    });
+    this.guideMaterial = new THREE.LineBasicMaterial({
+      color: 0x0c5f58,
+      transparent: true,
+      opacity: 0.62,
+      depthTest: false,
     });
 
     this.scene.add(new THREE.HemisphereLight(0xf7fffb, 0x7d8a86, 1.35));
@@ -68,15 +77,31 @@ export class MeshPreviewRenderer {
 
     if (!mesh?.triangles?.length) return;
 
-    this.geometry = geometryFromMesh(mesh);
+    const meshGeometry = geometryFromMesh(mesh);
+    this.geometry = meshGeometry.geometry;
+    this.modelCenter = meshGeometry.center;
     this.geometry.computeBoundingBox();
     this.geometry.computeBoundingSphere();
-    this.bounds = boundsFromBox(this.geometry.boundingBox);
+
+    const combinedBox = this.geometry.boundingBox.clone();
+    this.guideGeometry = guideGeometryFromMesh(mesh, this.modelCenter);
+    if (this.guideGeometry) {
+      this.guideGeometry.computeBoundingBox();
+      combinedBox.union(this.guideGeometry.boundingBox);
+    }
+
+    this.bounds = boundsFromBox(combinedBox);
 
     this.meshObject = new THREE.Mesh(this.geometry, this.material);
     this.group.add(this.meshObject);
 
     this.updateOutlineObject();
+
+    if (this.guideGeometry) {
+      this.guideObject = new THREE.LineSegments(this.guideGeometry, this.guideMaterial);
+      this.guideObject.renderOrder = 10;
+      this.group.add(this.guideObject);
+    }
   }
 
   updateOutlineObject() {
@@ -137,19 +162,25 @@ export class MeshPreviewRenderer {
   disposeMeshObjects() {
     if (this.meshObject) this.group.remove(this.meshObject);
     if (this.outlineObject) this.group.remove(this.outlineObject);
+    if (this.guideObject) this.group.remove(this.guideObject);
     this.geometry?.dispose();
     this.edgeGeometry?.dispose();
+    this.guideGeometry?.dispose();
     this.meshObject = null;
     this.outlineObject = null;
+    this.guideObject = null;
     this.geometry = null;
     this.edgeGeometry = null;
+    this.guideGeometry = null;
     this.bounds = null;
+    this.modelCenter = new THREE.Vector3();
   }
 
   dispose() {
     this.disposeMeshObjects();
     this.material.dispose();
     this.outlineMaterial.dispose();
+    this.guideMaterial.dispose();
     this.renderer.dispose();
   }
 }
@@ -172,9 +203,46 @@ function geometryFromMesh(mesh) {
   });
 
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const positionAttribute = new THREE.BufferAttribute(positions, 3);
+  geometry.setAttribute("position", positionAttribute);
   geometry.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
-  geometry.center();
+  geometry.computeBoundingBox();
+  const center = new THREE.Vector3();
+  geometry.boundingBox.getCenter(center);
+  geometry.translate(-center.x, -center.y, -center.z);
+  return { geometry, center };
+}
+
+function guideGeometryFromMesh(mesh, center) {
+  const guides = mesh?.previewGuides || [];
+  if (!guides.length) return null;
+
+  const points = [];
+
+  guides.forEach((guide) => {
+    if (guide.type !== "circle" || !Array.isArray(guide.center) || !Number.isFinite(guide.radius)) return;
+    const dashCount = Math.max(24, Math.round(guide.segments || 96));
+    const dashArc = (Math.PI * 2 * 0.46) / dashCount;
+    const [cx, cy, cz] = guide.center;
+
+    for (let i = 0; i < dashCount; i += 1) {
+      const t0 = (i / dashCount) * Math.PI * 2;
+      const t1 = t0 + dashArc;
+      points.push(
+        cx + Math.cos(t0) * guide.radius - center.x,
+        cy + Math.sin(t0) * guide.radius - center.y,
+        cz - center.z,
+        cx + Math.cos(t1) * guide.radius - center.x,
+        cy + Math.sin(t1) * guide.radius - center.y,
+        cz - center.z,
+      );
+    }
+  });
+
+  if (!points.length) return null;
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(points), 3));
   return geometry;
 }
 
