@@ -297,8 +297,8 @@
 <div class="workspace">
   <nav class="workspace-nav" aria-label="Application workspace">
     <div class="workspace-brand">
-      <span>Mechanical STL/DXF Generator</span>
-      <small>build parts, then check the drive ratios</small>
+      <span>Build Your Own Engine Display</span>
+      <small>Free DXF/STL files for makers, collectors, and old iron fans</small>
     </div>
 
     <div class="workspace-switcher">
