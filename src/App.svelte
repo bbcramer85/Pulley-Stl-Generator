@@ -285,7 +285,8 @@
     }
     syncWorkspaceFromHash();
     window.addEventListener("hashchange", syncWorkspaceFromHash);
-    rebuild();
+    rebuild(paramsByProject[projectKey], { projectKey });
+    fitDxfPreviewAfterLayout(projectConfigs[projectKey]);
 
     return () => {
       window.removeEventListener("hashchange", syncWorkspaceFromHash);

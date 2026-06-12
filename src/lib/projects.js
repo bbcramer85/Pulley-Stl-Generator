@@ -9,7 +9,8 @@ export const projectOrder = [
   "shaftSpacer",
   "lineshaftHanger",
   "headGasket",
-  "ignitorGasket",
+  "roundIgnitorGasket",
+  "squareIgnitorGasket",
   "dripOilerGasket",
 ];
 
@@ -23,7 +24,7 @@ export const projectKeysByCategory = {
     "shaftSpacer",
     "lineshaftHanger",
   ],
-  gaskets: ["headGasket", "ignitorGasket", "dripOilerGasket"],
+  gaskets: ["headGasket", "roundIgnitorGasket", "squareIgnitorGasket", "dripOilerGasket"],
 };
 
 export function projectCategoryForKey(projectKey) {
@@ -32,6 +33,17 @@ export function projectCategoryForKey(projectKey) {
 
 export function createProjectConfigs() {
   const engine = legacy();
+  const roundIgnitorDefaults = {
+    ...engine.ignitorGasketDefaults,
+    ignitorStyle: "round",
+  };
+  const squareIgnitorDefaults = {
+    ...engine.ignitorGasketDefaults,
+    ignitorStyle: "square",
+  };
+  const roundIgnitorControlGroups = ignitorControlGroupsForStyle(engine.ignitorGasketControlGroups, "round");
+  const squareIgnitorControlGroups = ignitorControlGroupsForStyle(engine.ignitorGasketControlGroups, "square");
+
   return {
     flatBeltPulley: {
       label: "Flat Belt Pulley",
@@ -130,16 +142,30 @@ export function createProjectConfigs() {
       downloadLabel: "Download DXF",
       previewTitle: "2D DXF View",
     },
-    ignitorGasket: {
-      label: "Ignitor Gasket",
-      defaults: engine.ignitorGasketDefaults,
-      controlGroups: engine.ignitorGasketControlGroups,
-      validate: engine.validateIgnitorGasket,
-      generate: engine.generateIgnitorGasketDxf,
+    roundIgnitorGasket: {
+      label: "Round Ignitor Gasket",
+      defaults: roundIgnitorDefaults,
+      controlGroups: roundIgnitorControlGroups,
+      validate: (raw) => engine.validateIgnitorGasket({ ...raw, ignitorStyle: "round" }),
+      generate: (params) => engine.generateIgnitorGasketDxf({ ...params, ignitorStyle: "round" }),
       metrics: engine.ignitorGasketMetricRows,
-      filePrefix: "ignitor-gasket",
-      stlName: "ignitor_gasket",
+      filePrefix: "round-ignitor-gasket",
+      stlName: "round_ignitor_gasket",
       fileDimensionKey: "ignitorCenterCircleDiameter",
+      exportType: "dxf",
+      downloadLabel: "Download DXF",
+      previewTitle: "2D DXF View",
+    },
+    squareIgnitorGasket: {
+      label: "Square Ignitor Gasket",
+      defaults: squareIgnitorDefaults,
+      controlGroups: squareIgnitorControlGroups,
+      validate: (raw) => engine.validateIgnitorGasket({ ...raw, ignitorStyle: "square" }),
+      generate: (params) => engine.generateIgnitorGasketDxf({ ...params, ignitorStyle: "square" }),
+      metrics: engine.ignitorGasketMetricRows,
+      filePrefix: "square-ignitor-gasket",
+      stlName: "square_ignitor_gasket",
+      fileDimensionKey: "ignitorCenterSquareWidth",
       exportType: "dxf",
       downloadLabel: "Download DXF",
       previewTitle: "2D DXF View",
@@ -159,6 +185,18 @@ export function createProjectConfigs() {
       previewTitle: "2D DXF View",
     },
   };
+}
+
+function ignitorControlGroupsForStyle(groups, style) {
+  return groups
+    .filter((group) => group.title !== "Style")
+    .map((group) => ({
+      ...group,
+      fields: group.fields.filter(
+        (field) => field.showWhen?.key !== "ignitorStyle" || field.showWhen.value === style,
+      ),
+    }))
+    .filter((group) => group.fields.length > 0);
 }
 
 export function cloneDefaults(project) {

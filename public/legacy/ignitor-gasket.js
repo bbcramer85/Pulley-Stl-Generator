@@ -1,7 +1,6 @@
 function ignitorGasketMetricRows(d) {
   return [
     ["File", "DXF"],
-    ["Style", d.style],
     ["Opening", d.openingLabel],
     ["OD W", formatDimension(d.outerWidth)],
     ["OD H", formatDimension(d.outerHeight)],

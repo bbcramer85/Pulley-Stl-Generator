@@ -141,7 +141,9 @@ function drawDxfDimensions(ctx, canvas, mesh, context, toScreen) {
 function getDxfDimensionSpecs(mesh, context) {
   if (!mesh || mesh.kind !== "dxf") return [];
   if (context.projectKey === "headGasket") return getHeadGasketDimensionSpecs(mesh, context);
-  if (context.projectKey === "ignitorGasket") return getIgnitorGasketDimensionSpecs(mesh, context);
+  if (["roundIgnitorGasket", "squareIgnitorGasket"].includes(context.projectKey)) {
+    return getIgnitorGasketDimensionSpecs(mesh, context);
+  }
   if (context.projectKey === "dripOilerGasket") return getDripOilerDimensionSpecs(context.params, context.formatDimension);
   return [];
 }
